@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Enchanted Journey | Celebration</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Great+Vibes&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+
+    <style>
+        /* --- CORE STYLES --- */
+        :root { --gold: #d4af37; --deep-purple: #2e1065; }
+        
+        html, body { 
+            width: 100%; 
+            overflow-x: hidden; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #050505; 
+            color: white; 
+            font-family: 'Montserrat', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @media (min-width: 769px) {
+            html.lenis { height: auto; } 
+            .lenis.lenis-smooth { scroll-behavior: auto; } 
+            .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; } 
+            .lenis.lenis-stopped { overflow: hidden; } 
+        }
+        
+        img { display: block; max-width: 100%; height: auto; }
+        
+        .font-cinematic { font-family: 'Cormorant Garamond', serif; }
+        .font-emotional { font-family: 'Great Vibes', cursive; }
+        #site-wrapper { opacity: 1; transition: opacity 1s ease; }
+        .perspective-1000 { perspective: 1000px; }
+        
+        @media (hover: hover) and (pointer: fine) {
+            .cursor-dot { position: fixed; top: 0; left: 0; width: 8px; height: 8px; background-color: var(--gold); border-radius: 50%; z-index: 10000; pointer-events: none; margin-left: -4px; margin-top: -4px; }
+            .cursor-outline { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border: 1px dashed rgba(212, 175, 55, 0.5); border-radius: 50%; z-index: 10000; pointer-events: none; margin-left: -20px; margin-top: -20px; will-change: transform; }
+            body { cursor: none; }
+        }
+
+        .masked-text-premium {
+            background: linear-gradient(to right, #8a6219, #e4c47d, #d4af37, #fcf6ba, #d4af37, #e4c47d, #8a6219);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: goldShimmer 4s linear infinite;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8));
+        }
+        @keyframes goldShimmer { to { background-position: 200% center; } }
+        
+        .parallax-item { will-change: transform; }
+        
+        @keyframes floatCustom { 
+            0% { transform: translate3d(0, 0, 0) rotate(0deg); } 
+            50% { transform: translate3d(10px, -15px, 0) rotate(2deg); } 
+            100% { transform: translate3d(0, 0, 0) rotate(0deg); } 
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { 
+                opacity: 0.3; 
+                transform: rotate(-5deg) scale(1) translateY(-10px); 
+                text-shadow: 0 0 40px rgba(212,175,55,0.6); 
+                filter: blur(3px); 
+            }
+            50% { 
+                opacity: 0.6; 
+                transform: rotate(-5deg) scale(1.05) translateY(-10px); 
+                text-shadow: 0 0 80px rgba(212,175,55,1), 0 0 30px rgba(255,255,255,0.5); 
+                filter: blur(1px); 
+            }
+        }
+        
+        /* --- TINY BLURRY STAR PHOTOS --- */
+        .photo-star { 
+            position: absolute; 
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            opacity: 0; 
+            animation: floatGlobalStar linear infinite; 
+            will-change: transform, opacity; 
+        }
+        
+        @keyframes floatGlobalStar { 
+            0% { transform: translateY(110vh) rotate(0deg) scale(0.5); opacity: 0; } 
+            10% { opacity: 0.4; } 
+            90% { opacity: 0.4; } 
+            100% { transform: translateY(-10vh) rotate(180deg) scale(1.2); opacity: 0; } 
+        }
+
+        @media (max-width: 768px) {
+            .masked-text-premium { animation: none; background: #d4af37; -webkit-background-clip: text; }
+        }
+
+        body.scroll-locked {
+            overflow: hidden !important;
+            height: 100vh !important;
+            touch-action: none; 
+        }
+
+        #intro-screen {
+            background: radial-gradient(circle at center, #1a0b2e 0%, #000000 80%); 
+        }
+
+        .intro-spotlight {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150vw; height: 150vw;
+            background: conic-gradient(from 0deg, transparent 0%, rgba(212, 175, 55, 0.05) 15%, transparent 30%);
+            animation: rotateSpotlight 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotateSpotlight {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .enter-btn {
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 15px 40px;
+            border-radius: 50px;
+            transition: all 0.5s ease;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .enter-btn:hover {
+            background: #d4af37;
+            border-color: #d4af37;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .enter-btn:hover span { color: #000; }
+        
+        .portal-glass {
+            background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212,175,55,0.1);
+            transition: all 0.5s ease;
+        }
+        .group:hover .portal-glass {
+            border-color: rgba(212,175,55,0.5);
+            box-shadow: 0 0 40px rgba(212,175,55,0.2);
+            transform: translateY(-10px);
+        }
+
+
+        @keyframes cloudDrift {
+    0% { transform: scale(1) translateX(0); }
+    100% { transform: scale(1.15) translateX(-2%); }
+}
+@keyframes cloudDriftReverse {
+    0% { transform: scale(1) translateX(0); }
+    100% { transform: scale(1.15) translateX(2%); }
+}
+.animate-cloud-drift { animation: cloudDrift 20s ease-in-out infinite alternate; }
+.animate-cloud-drift-reverse { animation: cloudDriftReverse 20s ease-in-out infinite alternate; }
+    </style>
+</head>
+<body>
+
+    <div id="global-stars" class="fixed inset-0 z-[1] pointer-events-none overflow-hidden"></div>
+
+    <div id="site-wrapper">
+        <div class="cursor-dot hidden md:block"></div>
+        <div class="cursor-outline hidden md:block"></div>
+
+<section id="intro-screen" class="fixed inset-0 z-[9999] flex items-center justify-center cursor-pointer overflow-hidden bg-transparent">
+
+    <div id="cloud-gate-left" class="absolute top-0 left-0 w-1/2 h-full bg-[#05020a] overflow-hidden flex justify-end shadow-[20px_0_50px_rgba(0,0,0,0.9)] z-10 will-change-transform">
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534152011248-19af35b02441?q=80&w=1500')] bg-cover bg-left opacity-50 mix-blend-screen animate-cloud-drift"></div>
+        <div class="absolute right-0 w-4 h-full bg-gradient-to-r from-transparent to-[#d4af37]/60 blur-[4px]"></div>
+    </div>
+
+    <div id="cloud-gate-right" class="absolute top-0 right-0 w-1/2 h-full bg-[#05020a] overflow-hidden flex justify-start shadow-[-20px_0_50px_rgba(0,0,0,0.9)] z-10 will-change-transform">
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534152011248-19af35b02441?q=80&w=1500')] bg-cover bg-right opacity-50 mix-blend-screen animate-cloud-drift-reverse"></div>
+        <div class="absolute left-0 w-4 h-full bg-gradient-to-l from-transparent to-[#d4af37]/60 blur-[4px]"></div>
+    </div>
+
+    <div id="intro-crack" class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[2px] bg-[#fcf6ba] shadow-[0_0_40px_10px_rgba(212,175,55,0.8)] z-20 animate-[pulse_2s_ease-in-out_infinite]"></div>
+
+    <div class="absolute bottom-0 w-full h-48 bg-gradient-to-t from-[#050505] to-transparent z-20 pointer-events-none opacity-80"></div>
+
+    <div id="intro-content" class="relative z-30 text-center px-4 pointer-events-none flex flex-col items-center">
+        <h1 class="text-6xl md:text-9xl font-cinematic font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#fcf6ba] via-[#d4af37] to-[#8a6219] tracking-widest drop-shadow-[0_0_25px_rgba(212,175,55,0.4)]">
+            ENTER
+        </h1>
+        <p class="font-emotional text-3xl text-purple-200/80 mt-2 mb-12 tracking-wide drop-shadow-md">The Queen's Realm</p>
+        
+        <div class="inline-block border border-[#d4af37]/40 bg-black/50 backdrop-blur-md px-8 py-3 rounded-full animate-bounce shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+            <span class="text-xs md:text-sm text-[#d4af37] tracking-[0.4em] uppercase font-cinematic">
+                Tap to Part the Clouds
+            </span>
+        </div>
+    </div>
+
+</section>
+
+        <section class="relative h-screen flex items-center justify-center overflow-hidden bg-[#050505] perspective-container group z-[2]">
+            <div class="absolute inset-0 bg-cover bg-center opacity-20 grayscale mix-blend-luminosity" style="background-image: url('https://images.unsplash.com/photo-1536630596259-22a7442a537d?w=1000');"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_95%)]"></div>
+            <div class="absolute inset-0 opacity-20 animate-pulse" style="background-image: url('https://www.transparenttextures.com/patterns/stardust.png');"></div>
+
+            <div id="particle-layer" class="absolute inset-0 z-10 overflow-hidden pointer-events-none">
+                <div class="parallax-item absolute top-[15%] left-[10%] w-24 h-32 md:w-28 md:h-36 bg-cover bg-center rounded-xl opacity-40 blur-[3px] animate-[floatCustom_14s_ease-in-out_infinite]" style="background-image: url('media/5.jpeg');"></div>
+                <div class="parallax-item absolute bottom-[20%] right-[15%] w-32 h-40 md:w-40 md:h-52 bg-cover bg-center rounded-xl opacity-30 blur-[5px] animate-[floatCustom_18s_ease-in-out_infinite_reverse]" style="background-image: url('media/1.jpeg');"></div>
+            </div>
+
+            <div class="absolute inset-0 flex items-center justify-center z-15 pointer-events-none select-none overflow-hidden px-4">
+                <h2 class="text-[12vw] md:text-[20vw] font-emotional text-[#d4af37] text-center leading-none animate-[pulseGlow_4s_ease-in-out_infinite]">
+                    Happy Birthday
+                </h2>
+            </div>
+
+            <div class="relative z-20 text-center w-full px-4 mix-blend-normal">
+                <p class="font-cinematic text-[#d4af37]/90 tracking-[1em] text-xs md:text-sm mb-6 animate-[fadeIn_2s_ease-out]">THE ONE & ONLY</p>
+                <h1 class="masked-text-premium text-[15vw] leading-[0.9] font-bold font-cinematic uppercase tracking-tighter">NITHYA</h1>
+                <div class="mt-12 flex items-center justify-center gap-6 opacity-0 animate-[slideUp_1s_ease-out_1s_forwards]">
+                    <div class="h-[1px] w-16 md:w-32 bg-gradient-to-r from-transparent to-[#d4af37]"></div>
+                    <p class="text-xl md:text-4xl font-emotional text-[#fce7f3]">The Golden Era Begins</p>
+                    <div class="h-[1px] w-16 md:w-32 bg-gradient-to-l from-transparent to-[#d4af37]"></div>
+                </div>
+            </div>
+            
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce z-30 pointer-events-none">
+                <span class="text-[10px] tracking-[0.3em] text-[#d4af37] uppercase">Explore</span>
+                <i class="fas fa-chevron-down text-[#d4af37]"></i>
+            </div>
+        </section>
+
+        <section class="min-h-[70vh] md:min-h-screen py-20 relative flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#050505] via-[#0a0305] to-[#050505] border-t border-[#f9a8d4]/10 z-[2]">
+            
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,168,212,0.05)_0%,transparent_60%)] pointer-events-none"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-2xl bg-[radial-gradient(circle,rgba(212,175,55,0.05)_0%,transparent_70%)] pointer-events-none blur-3xl"></div>
+            
+            <div class="relative z-20 w-full max-w-4xl mx-auto px-4 md:px-6 text-center poetry-card">
+                
+                <div class="flex items-center justify-center gap-4 mb-12 md:mb-20 opacity-80 fade-up-elem">
+                    <div class="h-[1px] w-16 md:w-40 bg-gradient-to-r from-transparent to-[#d4af37]"></div>
+                    <i class="fas fa-star text-[#d4af37] text-[10px] animate-pulse drop-shadow-[0_0_10px_#d4af37]"></i>
+                    <div class="h-[1px] w-16 md:w-40 bg-gradient-to-l from-transparent to-[#d4af37]"></div>
+                </div>
+
+                <div class="space-y-12 md:space-y-16 relative py-4 md:py-8">
+                    
+                    <i class="fas fa-quote-left absolute -top-8 left-0 md:-left-8 text-6xl md:text-[180px] text-[#f9a8d4]/5 transform -rotate-12 pointer-events-none"></i>
+                    <i class="fas fa-quote-right absolute -bottom-8 right-0 md:-right-8 text-6xl md:text-[180px] text-[#d4af37]/5 transform rotate-12 pointer-events-none"></i>
+
+                    <div class="fade-up-elem space-y-4">
+                        <p class="text-xl md:text-4xl font-light text-gray-300 font-cinematic tracking-wide leading-relaxed">
+                            "Olle hudugi neevu <span class="text-[#f9a8d4] font-emotional text-4xl md:text-6xl drop-shadow-[0_0_15px_rgba(249,168,212,0.6)] px-1">nithyaa</span>,
+                        </p>
+                        <p class="text-xl md:text-4xl font-light text-gray-300 font-cinematic tracking-wide leading-relaxed">
+                            Neevu sikkiddhe nanage doddha <span class="text-white font-medium drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">sathyaa</span>.
+                        </p>
+                    </div>
+                    
+                    <div class="fade-up-elem space-y-4" style="transition-delay: 0.1s;">
+                        <p class="text-xl md:text-4xl font-light text-gray-300 font-cinematic tracking-wide leading-relaxed">
+                            Nimmanna noduva hammaasige midiyuthide e <span class="text-[#fcf6ba] font-medium drop-shadow-[0_0_10px_rgba(252,246,186,0.5)]">mana</span>,
+                        </p>
+                        <p class="text-xl md:text-4xl font-light text-gray-300 font-cinematic tracking-wide leading-relaxed">
+                            Ivatthe nimma ee hosa payanada <span class="text-[#d4af37] font-emotional text-4xl md:text-6xl lowercase drop-shadow-[0_0_15px_rgba(212,175,55,0.6)] px-1">janmadhina!</span>"
+                        </p>
+                    </div>
+                    
+                    <div class="fade-up-elem space-y-4" style="transition-delay: 0.2s;">
+                        <p class="text-xl md:text-4xl font-light text-gray-300 font-cinematic tracking-wide leading-relaxed">
+                            "Nimma baalalli thumbirali hosa <span class="text-rose-300 font-medium drop-shadow-[0_0_10px_rgba(251,113,133,0.5)]">havana</span>,
+                        </p>
+                        <p class="text-xl md:text-4xl font-light text-gray-300 font-cinematic tracking-wide leading-relaxed">
+                            Santhoshadalli irali nimma prathi ondu <span class="text-white font-medium drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">kshana</span>.
+                        </p>
+                    </div>
+                    
+                    <div class="fade-up-elem pt-8 md:pt-12" style="transition-delay: 0.3s;">
+                        <p class="text-[12px] md:text-lg text-gray-400 mb-6 font-cinematic tracking-wider">
+                             <span class="italic text-gray-200"></span>...
+                        </p>
+                        <h2 class="text-5xl md:text-[6rem] font-emotional font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#fff] via-[#d4af37] to-[#8a6219] drop-shadow-[0_10px_20px_rgba(212,175,55,0.3)] leading-tight px-4 py-2">
+                            Happy Birthday heloke<br>thandhe e nanna kavana!
+                        </h2>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center mt-12 md:mt-20 opacity-80 fade-up-elem" style="transition-delay: 0.4s;">
+                    <div class="h-[1px] w-32 md:w-80 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent"></div>
+                </div>
+                
+            </div>
+        </section>
+
+        <section class="relative min-h-[70vh] md:h-screen py-12 flex items-center justify-center overflow-hidden bg-[#0f0c29] z-[2]">
+            <canvas id="star-canvas" class="absolute inset-0 w-full h-full opacity-60"></canvas>
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a0b2e] pointer-events-none"></div>
+            
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] md:w-[600px] md:h-[600px] border-[1px] border-[#d4af37]/10 rounded-full animate-[spin_60s_linear_infinite] pointer-events-none"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] md:w-[450px] md:h-[450px] border-[1px] border-dashed border-[#d4af37]/20 rounded-full animate-[spin_40s_linear_infinite_reverse] pointer-events-none"></div>
+
+            <div class="relative z-20 text-center px-4 pointer-events-none">
+                <div class="mb-6 md:mb-8 inline-flex items-center gap-2 md:gap-3 bg-white/5 backdrop-blur-md border border-[#d4af37]/30 px-6 py-2 md:px-8 md:py-3 rounded-full shadow-[0_0_20px_rgba(212,175,55,0.1)]">
+                    <span class="text-sm md:text-xl">✨</span>
+                    <span class="font-cinematic text-[10px] md:text-sm tracking-[0.3em] text-[#fce7f3] uppercase">Celestial Alignment</span>
+                </div>
+                <h2 class="text-4xl md:text-8xl font-cinematic leading-none mb-4 md:mb-6 text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">THE STARS<br>ALIGNED</h2>
+                <div class="relative inline-block mt-2 md:mt-4">
+                    <p class="relative text-2xl md:text-5xl font-emotional text-[#d4af37]" id="birth-date-display">March 04, 2005</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="timetravel-anchor" class="min-h-[70vh] md:min-h-screen relative flex items-center justify-center py-12 overflow-hidden bg-[#1a0b2e] z-[2]">
+            <div class="w-full max-w-4xl px-4 text-center z-20 relative">
+                <h2 class="text-4xl md:text-6xl font-cinematic mb-2 text-white">The Sands of Time</h2>
+                <p class="text-purple-200/80 font-emotional text-xl md:text-2xl mb-10 md:mb-16">Step through the gate to revisit the past</p>
+                
+                <div class="relative group cursor-pointer inline-block" onclick="enterPortal()">
+                    <div class="absolute inset-0 border-[2px] border-[#d4af37]/30 rounded-full animate-[spin_10s_linear_infinite] scale-[1.1] md:scale-[1.15] pointer-events-none"></div>
+                    <div class="absolute inset-0 border-t-2 border-b-2 border-[#d4af37]/50 rounded-full animate-[spin_15s_linear_infinite_reverse] scale-[1.2] md:scale-[1.3] pointer-events-none"></div>
+
+                    <div class="relative w-[200px] h-[200px] md:w-[260px] md:h-[260px] rounded-full overflow-hidden border border-[#d4af37]/50 shadow-[0_0_40px_rgba(212,175,55,0.2)] portal-target portal-glass">
+                        <div class="absolute inset-0 bg-cover opacity-50 mix-blend-screen transition-all duration-700 group-hover:scale-110" style="background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800');"></div>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center z-20">
+                            <span class="text-4xl md:text-5xl transform transition-transform duration-500 group-hover:scale-125">⏳</span>
+                            <span class="mt-3 md:mt-4 font-cinematic text-white tracking-[0.4em] text-xs md:text-sm uppercase group-hover:text-[#d4af37] transition-colors">Enter</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="memories-anchor" class="min-h-[70vh] md:min-h-screen relative flex items-center justify-center py-12 overflow-hidden bg-gradient-to-b from-[#1a0b2e] to-[#000000] z-[2]">
+            <div class="w-full max-w-4xl px-4 text-center z-20 relative">
+                <h2 class="text-4xl md:text-7xl font-cinematic mb-2 text-white">Flashbacks</h2>
+                <p class="text-[#d4af37]/80 font-emotional text-xl md:text-2xl mb-10 md:mb-16 tracking-wide">Every picture tells a story...</p>
+                
+                <div class="relative group cursor-pointer inline-block perspective-1000" onclick="enterMemories()">
+                    <div class="absolute inset-0 bg-white/10 rounded-xl transform rotate-6 scale-95 border border-white/10 shadow-lg pointer-events-none transition-transform duration-500 group-hover:rotate-12 group-hover:scale-100"></div>
+                    <div class="absolute inset-0 bg-white/5 rounded-xl transform -rotate-3 scale-95 border border-white/5 shadow-lg pointer-events-none -z-10 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-100"></div>
+                    
+                    <div class="relative w-[220px] h-[300px] md:w-[260px] md:h-[360px] rounded-xl album-target portal-glass z-10 bg-[#0a0a0a]">
+                        <div class="absolute inset-2 rounded-lg overflow-hidden border border-white/10">
+                            <img src="media/p/p9.jpeg" class="w-full h-full object-cover opacity-70 transition-transform duration-700 group-hover:scale-110" loading="lazy">
+                            <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 group-hover:bg-black/30 transition-colors duration-500">
+                                <span class="font-cinematic text-xl md:text-2xl text-white tracking-[0.2em] uppercase group-hover:text-[#d4af37] transition-colors shadow-black drop-shadow-md">Open Album</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="wishes-anchor" class="min-h-[70vh] md:min-h-screen relative flex items-center justify-center py-12 overflow-hidden bg-black z-[2]">
+            <div class="w-full max-w-4xl px-4 text-center z-20 relative">
+                <h2 class="text-4xl md:text-7xl font-cinematic mb-2 text-white">Echoes of Love</h2>
+                <p class="text-purple-200/70 font-emotional text-xl md:text-2xl mb-10 md:mb-16 tracking-wider">Voices from the universe</p>
+                
+                <div class="relative group cursor-pointer inline-block" onclick="enterWishes()">
+                    <div class="absolute inset-0 rounded-full border border-purple-500/30 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite] pointer-events-none scale-125"></div>
+                    <div class="absolute inset-0 rounded-full border border-[#d4af37]/20 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite] delay-700 pointer-events-none scale-110"></div>
+
+                    <div class="relative w-[200px] h-[200px] md:w-[260px] md:h-[260px] rounded-full overflow-hidden wishes-target bg-[#0a0a0a] portal-glass">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-[#2e1065] via-[#d4af37]/20 to-[#db2777] opacity-60 transition-opacity duration-500 group-hover:opacity-100"></div>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center z-20">
+                            <div class="w-12 h-12 md:w-16 md:h-16 bg-white/5 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+                                <i class="fas fa-play text-xl md:text-2xl text-[#d4af37] ml-1"></i>
+                            </div>
+                            <span class="mt-3 md:mt-4 font-cinematic text-purple-100 tracking-[0.3em] text-[10px] md:text-xs uppercase group-hover:text-[#d4af37] transition-colors">Listen</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="gallery-anchor" class="min-h-screen relative flex items-center justify-center overflow-hidden bg-black perspective-1000">
+            <div id="mosaic-grid" class="absolute inset-0 grid grid-cols-6 md:grid-cols-12 opacity-30 gap-1"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black z-10"></div>
+            <div class="relative z-20 text-center space-y-8">
+                <h2 class="text-6xl md:text-9xl font-cinematic text-white tracking-tighter mix-blend-overlay">THE VAULT</h2>
+                <div class="w-[1px] h-24 bg-gradient-to-b from-transparent via-[#d4af37] to-transparent mx-auto"></div>
+                <p class="text-[#d4af37] font-mono text-xs tracking-[1em] uppercase">200+ Moments Captured</p>
+                <button onclick="enterGallery()" class="group relative px-12 py-4 bg-transparent overflow-hidden rounded-full border border-white/20">
+                    <span class="relative text-white font-cinematic tracking-widest uppercase">Open The Archives</span>
+                </button>
+            </div>
+        </section>
+
+        <section id="cake-anchor" class="min-h-[70vh] md:min-h-screen relative flex flex-col items-center justify-center py-12 overflow-hidden bg-black z-[2]">
+            <div id="cake-preview-section" class="z-20 text-center relative group cursor-pointer" onclick="enterCake()">
+                <h2 class="text-5xl md:text-8xl font-emotional text-white mb-6 md:mb-8 animate-pulse">Make a Wish</h2>
+                
+                <div class="relative w-48 h-48 md:w-64 md:h-64 mx-auto mt-8 md:mt-12 cake-target transition-transform duration-500 group-hover:scale-110">
+                    <div class="absolute -bottom-4 md:-bottom-8 left-1/2 -translate-x-1/2 w-32 md:w-48 h-4 md:h-8 bg-[#d4af37] rounded-[100%] blur-[10px] opacity-30 group-hover:opacity-60 transition-opacity"></div>
+                    <div class="absolute inset-0 bg-[#d4af37] rounded-full blur-[60px] opacity-10 group-hover:opacity-30 transition-opacity"></div>
+                    
+                    <div class="relative z-10 text-8xl md:text-9xl drop-shadow-[0_0_20px_rgba(212,175,55,0.5)]">🎂</div>
+                    
+                    <div class="absolute -bottom-8 md:-bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                        <span class="font-cinematic text-[#d4af37] tracking-[0.4em] md:tracking-[0.5em] text-[10px] md:text-xs uppercase border-b border-[#d4af37]/50 pb-1 group-hover:border-[#d4af37] transition-colors">Tap to Cut</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+<script>
+const app = {
+    init: function() {
+        const isMobile = window.innerWidth < 768;
+
+        if (!isMobile) {
+            window.lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                smooth: true
+            });
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+            requestAnimationFrame(raf);
+        }
+
+        if (!isMobile && window.matchMedia("(hover: hover)").matches) {
+            const dot = document.querySelector('.cursor-dot');
+            const outline = document.querySelector('.cursor-outline');
+            window.addEventListener('mousemove', e => {
+                gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0.1 });
+                gsap.to(outline, { x: e.clientX, y: e.clientY, duration: 0.15 });
+            });
+        }
+
+        this.initIntro();
+        this.initStarMap(isMobile);
+        this.initScroll();
+        this.initGlobalPhotoStars(isMobile);
+    },
+
+    initIntro: function() {
+        const intro = document.getElementById('intro-screen');
+        const urlParams = new URLSearchParams(window.location.search);
+        const skipIntro = urlParams.get('skipIntro');
+        const hash = window.location.hash;
+
+        document.body.classList.add('scroll-locked');
+        if (window.lenis) lenis.stop();
+
+        if (skipIntro === 'true') {
+            if (intro) intro.style.display = 'none';
+            document.body.classList.remove('scroll-locked');
+            gsap.set(".hero-text", { y: 0, opacity: 1 });
+
+            if (hash) {
+                const target = document.querySelector(hash);
+                if (target) {
+                    setTimeout(() => {
+                        if (window.lenis) {
+                            lenis.start();
+                            lenis.scrollTo(target, { offset: 0, duration: 0 });
+                        } else {
+                            target.scrollIntoView();
+                        }
+                    }, 100);
+                }
+            }
+            return;
+        }
+
+        if (intro) {
+            const enterRealm = () => {
+                gsap.to('.fade-elem', { y: -20, opacity: 0, stagger: 0.1, duration: 0.8 });
+                gsap.to(intro, {
+                    opacity: 0,
+                    duration: 1.2,
+                    ease: "power2.inOut",
+                    onComplete: () => {
+                        intro.style.display = 'none';
+                        document.body.classList.remove('scroll-locked');
+                        if (window.lenis) {
+                            window.lenis.start();
+                            if (hash) {
+                                const target = document.querySelector(hash);
+                                if (target) lenis.scrollTo(target, { offset: 0, duration: 2 });
+                            }
+                        }
+                    }
+                });
+            };
+            intro.addEventListener('click', enterRealm);
+        }
+    },
+
+    initStarMap: function(isMobile) {
+        const canvas = document.getElementById('star-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let w, h;
+        const stars = [];
+        const resize = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; };
+        window.addEventListener('resize', resize);
+        resize();
+
+        const starCount = isMobile ? 30 : 100;
+        for (let i = 0; i < starCount; i++) {
+            stars.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 2, speed: Math.random() * 0.5 });
+        }
+
+        const animate = () => {
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = "#fcf6ba";
+            stars.forEach(s => {
+                s.y -= s.speed;
+                if (s.y < 0) s.y = h;
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        };
+        animate();
+    },
+
+    initScroll: function() {
+        gsap.utils.toArray('.scroll-reveal').forEach(elem => {
+            gsap.to(elem, { y: 0, opacity: 1, duration: 1.5, scrollTrigger: { trigger: elem, start: "top 85%" } });
+        });
+        gsap.from(".poetry-card", { scale: 0.95, opacity: 0, duration: 1, scrollTrigger: { trigger: ".poetry-card", start: "top 80%" } });
+        gsap.utils.toArray('.poetry-line').forEach((line, i) => {
+            gsap.to(line, { opacity: 1, y: 0, duration: 1, delay: i * 0.1, scrollTrigger: { trigger: ".poetry-card", start: "top 70%" } });
+        });
+    },
+
+    initGlobalPhotoStars: function(isMobile) {
+        const container = document.getElementById('global-stars');
+        if (!container) return;
+        
+        const images = ['media/1.jpeg', 'media/2.jpeg', 'media/3.jpeg', 'media/4.jpeg', 'media/5.jpeg'];
+        const fragment = document.createDocumentFragment();
+        
+        const count = isMobile ? 20 : 40; 
+        
+        for (let i = 0; i < count; i++) {
+            const div = document.createElement('div');
+            div.classList.add('photo-star');
+            
+            const size = Math.random() * 15 + 10; 
+            
+            div.style.left = `${Math.random() * 100}vw`;
+            div.style.width = `${size}px`;
+            div.style.height = `${size}px`;
+            div.style.backgroundImage = `url('${images[Math.floor(Math.random() * images.length)]}')`;
+            div.style.backgroundSize = 'cover';
+            div.style.backgroundPosition = 'center';
+            
+            div.style.filter = `blur(${Math.random() * 2 + 1}px) brightness(0.8)`;
+            div.style.animationDuration = `${Math.random() * 20 + 20}s`; 
+            div.style.animationDelay = `-${Math.random() * 30}s`; 
+            
+            fragment.appendChild(div);
+        }
+        container.appendChild(fragment);
+    }
+};
+
+window.enterPortal = () => {
+    gsap.to("body", { backgroundColor: "#000", duration: 0.5 });
+    setTimeout(() => window.location.href = 'timetravel.html', 500);
+};
+window.enterMemories = () => {
+    gsap.to("body", { backgroundColor: "#000", duration: 0.5 });
+    setTimeout(() => window.location.href = 'memories.html', 500);
+};
+window.enterWishes = () => {
+    gsap.to("body", { backgroundColor: "#000", duration: 0.5 });
+    setTimeout(() => window.location.href = 'wishes.html', 500);
+};
+window.enterCake = () => {
+    gsap.to('.cake-target', { scale: 50, opacity: 0, duration: 1 });
+    setTimeout(() => window.location.href = 'cake.html', 1000);
+};
+
+window.addEventListener('DOMContentLoaded', () => app.init());
+
+    
+    window.enterGallery = () => {
+    // Fades the screen to black smoothly
+    gsap.to("body", { backgroundColor: "#000", opacity: 0, duration: 0.5 });
+    
+    // Redirects to gallery.html after the fade animation finishes
+    setTimeout(() => {
+        window.location.href = 'gallery.html';
+    }, 500);
+};
+</script>
+    
+</body>
+</html>

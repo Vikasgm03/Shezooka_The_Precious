@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BLOOM • Her Birthday Memories</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Great+Vibes&family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --rose-gold: #e8b4b8;
+            --blush: #f8d7e3;
+            --dark: #050505;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .font-cinematic { font-family: 'Cormorant Garamond', serif; }
+        .font-emotional { font-family: 'Great Vibes', cursive; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+
+        /* SCROLL LOCK */
+        body.scroll-locked {
+            overflow: hidden !important;
+            height: 100vh !important;
+            touch-action: none;
+        }
+
+        /* Smooth Scroll */
+        @media (min-width: 769px) {
+            html.lenis { height: auto; }
+            .lenis.lenis-smooth { scroll-behavior: auto; }
+            .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+        }
+
+        /* Custom Cursor */
+        @media (hover: hover) and (pointer: fine) {
+            .cursor-dot { position: fixed; top: 0; left: 0; width: 10px; height: 10px; background: var(--rose-gold); border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate(-50%, -50%); box-shadow: 0 0 15px var(--rose-gold); }
+            .cursor-outline { position: fixed; top: 0; left: 0; width: 50px; height: 50px; border: 1px solid rgba(232,180,184,0.6); border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate(-50%, -50%); transition: all 0.4s cubic-bezier(0.23,1,0.32,1); }
+            body { cursor: none; }
+        }
+
+        /* Film Grain + Petals Container */
+        .film-grain::after {
+            content: ""; position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.035; pointer-events: none; mix-blend-mode: overlay; z-index: 9999;
+        }
+        .petals-container { position: fixed; inset: 0; pointer-events: none; z-index: 9998; overflow: hidden; }
+
+        /* Cosmic Gate - now with rose-gold glow */
+        .gate { position: fixed; top: 0; width: 50vw; height: 100vh; background: #030105; z-index: 100000; display: flex; align-items: center; will-change: transform; }
+        #gate-left { left: 0; border-right: 1px solid rgba(232,180,184,0.3); box-shadow: inset -40px 0 80px rgba(0,0,0,0.85); }
+        #gate-right { right: 0; border-left: 1px solid rgba(232,180,184,0.3); box-shadow: inset 40px 0 80px rgba(0,0,0,0.85); }
+        #gate-flash {
+            position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 3px; height: 0; background: linear-gradient(transparent, #fff, transparent);
+            box-shadow: 0 0 60px 15px var(--rose-gold), 0 0 120px 30px #fff; z-index: 100001; opacity: 0;
+        }
+
+        /* Sticky Editorial Stack */
+        .stack-container { position: relative; width: 100%; }
+        .sticky-card {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 -25px 60px rgba(0,0,0,0.9);
+        }
+        .art-frame {
+            position: relative;
+            width: 88vw;
+            max-width: 1100px;
+            height: 78vh;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(232,180,184,0.15);
+            background: #000;
+            transition: all 1s cubic-bezier(0.23,1,0.32,1);
+        }
+        .cinematic-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(55%) contrast(115%) brightness(72%) sepia(15%);
+            transform: scale(1.08);
+            transition: all 1.4s cubic-bezier(0.23,1,0.32,1);
+        }
+        .art-frame:hover .cinematic-img {
+            filter: grayscale(0%) contrast(108%) brightness(108%) sepia(0%);
+            transform: scale(1);
+        }
+        .art-frame:hover {
+            border-color: var(--rose-gold);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.95), inset 0 0 60px rgba(232,180,184,0.2);
+        }
+        .vignette {
+            position: absolute; inset: 0; pointer-events: none;
+            background: radial-gradient(circle at center, transparent 35%, rgba(5,5,5,0.85) 95%);
+        }
+
+        /* Glass Info - now more luxurious */
+        .info-glass {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            background: rgba(5,5,5,0.65);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-left: 3px solid var(--rose-gold);
+            padding: 28px 36px;
+            border-radius: 12px;
+            max-width: 420px;
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.23,1,0.32,1);
+        }
+        .art-frame:hover .info-glass {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        @media (max-width: 768px) {
+            .art-frame { width: 92vw; height: 82vh; }
+            .info-glass { bottom: 20px; left: 20px; right: 20px; max-width: none; padding: 20px; }
+        }
+
+        /* Floating Chapter Dots */
+        .chapter-dots {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border: 2px solid var(--rose-gold);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+        .dot.active { background: var(--rose-gold); transform: scale(1.6); box-shadow: 0 0 20px var(--rose-gold); }
+
+        /* Confetti Canvas */
+        #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 999999; }
+
+        /* Music Toggle */
+        .music-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 99999;
+            background: rgba(5,5,5,0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--rose-gold);
+            color: var(--rose-gold);
+            padding: 12px 20px;
+            border-radius: 9999px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.4s ease;
+        }
+    </style>
+</head>
+<body class="scroll-locked film-grain">
+    <div class="petals-container" id="petals"></div>
+
+    <div id="gate-left" class="gate"></div>
+    <div id="gate-right" class="gate"></div>
+    <div id="gate-flash"></div>
+
+    <div id="entrance-seal" class="fixed inset-0 z-[100002] flex flex-col items-center justify-center pointer-events-none">
+        <div class="relative flex items-center justify-center w-48 h-48">
+            <div class="absolute w-40 h-40 border border-[rgba(232,180,184,0.4)] rounded-full animate-[ping_3s_infinite]"></div>
+            <i class="fas fa-birthday-cake text-[#e8b4b8] text-6xl drop-shadow-[0_0_30px_rgba(232,180,184,0.9)]"></i>
+        </div>
+        <p class="mt-10 font-cinematic text-[#e8b4b8] tracking-[0.6em] uppercase text-sm animate-pulse">BLOOM • Opening Her Magical Day</p>
+    </div>
+
+    <div class="cursor-dot hidden md:block"></div>
+    <div class="cursor-outline hidden md:block"></div>
+
+    <a href="home.html?skipIntro=true#wishes-anchor" class="fixed top-6 left-6 z-50 text-white/60 hover:text-[#e8b4b8] transition-all flex items-center gap-3 bg-black/40 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/10 cursor-pointer">
+        <i class="fas fa-arrow-left"></i>
+        <span class="tracking-widest text-xs font-cinematic">RETURN HOME</span>
+    </a>
+
+    <button onclick="toggleMusic()" id="music-btn" class="music-btn cursor-pointer hover:bg-white/10 hover:scale-105">
+        <i class="fas fa-music"></i>
+        <span id="music-text">PLAY HER SONG</span>
+    </button>
+
+    <div class="sticky-card bg-[#050505]">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(232,180,184,0.12)_0%,transparent_65%)]"></div>
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519741497674-611027288377?w=2000')] bg-cover bg-center opacity-10 mix-blend-screen"></div>
+        
+        <div class="text-center z-10 px-6 max-w-5xl mx-auto">
+            <p class="text-[#e8b4b8] text-xs tracking-[0.5em] font-mono mb-4 opacity-0" id="hero-sub">Once upon a birthday...</p>
+            <h1 class="text-7xl md:text-[10rem] leading-none font-playfair font-bold text-white tracking-[-4px] mix-blend-overlay drop-shadow-2xl opacity-0" id="hero-title" style="text-shadow: 0 0 60px rgba(232,180,184,0.5);">
+                BLOOM
+            </h1>
+            <p class="mt-3 text-2xl md:text-4xl font-emotional text-[#e8b4b8] opacity-0" id="hero-name">Her Birthday Story</p>
+            
+            <div class="w-px h-28 bg-gradient-to-b from-[#e8b4b8] to-transparent mx-auto mt-12 opacity-0" id="hero-line"></div>
+            <p class="mt-10 font-emotional text-3xl text-rose-200/80 opacity-0" id="scroll-hint">Scroll to relive the magic ✨</p>
+        </div>
+    </div>
+
+    <div class="stack-container">
+
+        <div class="sticky-card bg-[#0a0508]">
+            <div class="art-frame group">
+                <img src="media/6.jpeg" class="cinematic-img" alt="Birthday Glow">
+                <div class="vignette"></div>
+                <div class="info-glass">
+                    <span class="text-[#e8b4b8] font-mono text-[10px] tracking-[0.4em] block mb-3">CHAPTER I • The Glow</span>
+                    <h2 class="text-5xl font-emotional text-white">Candlelit Wishes</h2>
+                    <p class="text-rose-100/90 leading-relaxed mt-3">The room held its breath as she closed her eyes and made a wish that lit up the entire universe.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="sticky-card bg-[#050508]">
+            <div class="art-frame group">
+                <img src="media/5.jpeg" class="cinematic-img" alt="Cake Moment">
+                <div class="vignette"></div>
+                <div class="info-glass" style="left: auto; right: 40px; border-left: none; border-right: 3px solid var(--rose-gold); text-align: right;">
+                    <span class="text-[#e8b4b8] font-mono text-[10px] tracking-[0.4em] block mb-3">CHAPTER II • The Sweetness</span>
+                    <h2 class="text-5xl font-emotional text-white">Slice of Heaven</h2>
+                    <p class="text-rose-100/90 leading-relaxed mt-3">Every bite tasted like laughter, love, and the kind of joy that only happens once a year.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="sticky-card bg-[#080508]">
+            <div class="art-frame group">
+                <img src="media/p/p9.jpeg" class="cinematic-img" alt="Birthday Spirit">
+                <div class="vignette"></div>
+                <div class="info-glass">
+                    <span class="text-[#e8b4b8] font-mono text-[10px] tracking-[0.4em] block mb-3">CHAPTER III • The Spark</span>
+                    <h2 class="text-5xl font-emotional text-white">Fireworks in Her Soul</h2>
+                    <p class="text-rose-100/90 leading-relaxed mt-3">Blowing out every candle with the power of a thousand dreams coming true.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="sticky-card bg-[#05080a]">
+            <div class="art-frame group">
+                <img src="media/1.jpeg" class="cinematic-img" alt="Gift Moment">
+                <div class="vignette"></div>
+                <div class="info-glass" style="left: auto; right: 40px; border-left: none; border-right: 3px solid var(--rose-gold); text-align: right;">
+                    <span class="text-[#e8b4b8] font-mono text-[10px] tracking-[0.4em] block mb-3">CHAPTER IV • The Love</span>
+                    <h2 class="text-5xl font-emotional text-white">Wrapped in Forever</h2>
+                    <p class="text-rose-100/90 leading-relaxed mt-3">Every ribbon, every bow, every hug reminded her how deeply she is loved.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="sticky-card bg-[#050505]">
+            <div class="art-frame group">
+                <img src="media/25.jpg" class="cinematic-img" alt="Timeless Smile">
+                <div class="vignette"></div>
+                <div class="info-glass">
+                    <span class="text-[#e8b4b8] font-mono text-[10px] tracking-[0.4em] block mb-3">CHAPTER V • The Bloom</span>
+                    <h2 class="text-5xl font-emotional text-white">Forever Young</h2>
+                    <p class="text-rose-100/90 leading-relaxed mt-3">A single frame that holds an entire lifetime of birthday magic and endless joy.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="final-chapter" class="sticky-card bg-black flex flex-col items-center justify-center text-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(232,180,184,0.15)_0%,transparent_70%)] pointer-events-none"></div>
+            
+            <i class="fas fa-heart text-[#e8b4b8] text-6xl mb-6 drop-shadow-2xl"></i>
+
+            <p class="text-4xl font-emotional text-[#e8b4b8] mb-12">You are the most beautiful bloom in the garden of life</p>
+            
+            <button onclick="window.location.href='home.html?skipIntro=true#wishes-anchor'" 
+                    class="px-12 py-5 border border-[#e8b4b8]/60 hover:border-[#e8b4b8] rounded-full text-sm tracking-widest font-cinematic transition-all hover:scale-105 relative z-20 cursor-pointer bg-black/30 backdrop-blur-sm">
+                RETURN TO THE WORLD
+            </button>
+        </div>
+    </div>
+
+    <div class="chapter-dots hidden md:flex" id="chapter-dots"></div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        const isMobile = window.innerWidth < 768;
+
+        // Lenis Smooth Scroll
+        let lenis;
+        if (!isMobile) {
+            lenis = new Lenis({ duration: 1.4, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+            function raf(time) { lenis.raf(time); ScrollTrigger.update(); requestAnimationFrame(raf); }
+            requestAnimationFrame(raf);
+        }
+
+        // Custom Cursor
+        if (!isMobile) {
+            const dot = document.querySelector('.cursor-dot');
+            const outline = document.querySelector('.cursor-outline');
+            window.addEventListener('mousemove', e => {
+                gsap.to(dot, {x: e.clientX, y: e.clientY, duration: 0.1});
+                gsap.to(outline, {x: e.clientX, y: e.clientY, duration: 0.25});
+            });
+        }
+
+        // Floating Cherry Blossom Petals
+        function createPetals() {
+            const container = document.getElementById('petals');
+            for (let i = 0; i < 45; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'absolute text-3xl text-[#e8b4b8]/40 pointer-events-none';
+                petal.innerHTML = '🌸';
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.top = '-50px';
+                petal.style.animation = `fall ${Math.random() * 18 + 14}s linear infinite`;
+                petal.style.animationDelay = `-${Math.random() * 20}s`;
+                petal.style.transform = `rotate(${Math.random() * 360}deg)`;
+                petal.style.opacity = Math.random() * 0.6 + 0.3;
+                container.appendChild(petal);
+            }
+        }
+        const petalStyle = document.createElement('style');
+        petalStyle.innerHTML = `@keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }`;
+        document.head.appendChild(petalStyle);
+
+        // Entrance Gate Animation & Scroll Lock Management
+        window.onload = () => {
+            if (lenis) lenis.stop(); // Lock scrolling on desktop
+            
+            createPetals();
+
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    document.body.classList.remove('scroll-locked'); // Unlock scrolling on mobile
+                    if (lenis) lenis.start(); // Unlock scrolling on desktop
+                }
+            });
+            
+            tl.to(".ring-1", { scale: 18, opacity: 0, duration: 1.8, ease: "power2.in" }, "+=0.6")
+              .to(".ring-2", { scale: 18, opacity: 0, duration: 1.8, ease: "power2.in" }, "-=1.3")
+              .to("#entrance-seal", { opacity: 0, duration: 0.6 }, "-=0.8")
+              .to("#gate-flash", { opacity: 1, height: "100%", duration: 0.5, ease: "power3.out" })
+              .to("#gate-flash", { width: "100vw", opacity: 0, duration: 1.8, ease: "expo.inOut" }, "open")
+              .to("#gate-left", { x: "-100%", duration: 1.8, ease: "power3.inOut" }, "open")
+              .to("#gate-right", { x: "100%", duration: 1.8, ease: "power3.inOut" }, "open")
+              .to("#hero-sub", { opacity: 1, y: -30, duration: 1.2 }, "open+=0.6")
+              .to("#hero-title", { opacity: 1, y: -40, duration: 1.6, ease: "expo.out" }, "open+=0.9")
+              .to("#hero-name", { opacity: 1, y: -20, duration: 1.4 }, "open+=1.1")
+              .to("#hero-line", { opacity: 1, duration: 1 }, "open+=1.4")
+              .to("#scroll-hint", { opacity: 1, duration: 1.2 }, "open+=1.7")
+              .set(".gate", { display: "none" })
+              .set("#gate-flash", { display: "none" })
+              .set("#entrance-seal", { display: "none" });
+
+            // Parallax on images
+            if (!isMobile) {
+                gsap.utils.toArray('.art-frame').forEach((frame, i) => {
+                    const img = frame.querySelector('.cinematic-img');
+                    gsap.to(img, {
+                        yPercent: 12,
+                        ease: "none",
+                        scrollTrigger: { trigger: frame, start: "top bottom", end: "bottom top", scrub: 1.2 }
+                    });
+                });
+            }
+
+            // Chapter dots
+            createChapterDots();
+
+            // Confetti on final chapter
+            ScrollTrigger.create({
+                trigger: "#final-chapter",
+                start: "top 60%",
+                onEnter: () => launchConfetti()
+            });
+        };
+
+        // Chapter Navigation Dots
+        function createChapterDots() {
+            const container = document.getElementById('chapter-dots');
+            const chapters = document.querySelectorAll('.sticky-card');
+            chapters.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.onclick = () => {
+                    if (lenis) lenis.scrollTo(chapters[i], { offset: -50 });
+                };
+                container.appendChild(dot);
+            });
+
+            // Highlight active
+            ScrollTrigger.create({
+                trigger: ".stack-container",
+                start: "top top",
+                end: "bottom bottom",
+                onUpdate: (self) => {
+                    const progress = Math.floor(self.progress * 5);
+                    document.querySelectorAll('.dot').forEach((d, i) => {
+                        d.classList.toggle('active', i === progress);
+                    });
+                }
+            });
+        }
+
+        // Confetti Explosion
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const ctx = canvas.getContext('2d');
+            const colors = ['#e8b4b8', '#d4af37', '#ff69b4', '#fff'];
+            const particles = [];
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height - canvas.height;
+                    this.size = Math.random() * 9 + 5;
+                    this.speed = Math.random() * 6 + 4;
+                    this.angle = Math.random() * 360;
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                }
+                update() {
+                    this.y += this.speed;
+                    this.angle += 4;
+                }
+                draw() {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.angle * Math.PI / 180);
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size * 0.6);
+                    ctx.restore();
+                }
+            }
+
+            for (let i = 0; i < 280; i++) particles.push(new Particle());
+
+            let frame = 0;
+            function animateConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach((p, i) => {
+                    p.update();
+                    p.draw();
+                    if (p.y > canvas.height) particles.splice(i, 1);
+                });
+                frame++;
+                if (frame < 220) requestAnimationFrame(animateConfetti);
+                else canvas.style.opacity = 0;
+            }
+            animateConfetti();
+        }
+
+        // Background Music Toggle 
+        let audio = null;
+        let isPlaying = false;
+        function toggleMusic() {
+            if (!audio) {
+                audio = new Audio('media/Finding Her – Kushagra _ Vanshika Kashyap Ringtone Download - MobCup.Com.Co.mp3'); 
+                audio.loop = true;
+            }
+            if (isPlaying) {
+                audio.pause();
+                document.getElementById('music-text').innerHTML = 'PLAY HER SONG';
+            } else {
+                audio.play();
+                document.getElementById('music-text').innerHTML = 'PAUSE SONG';
+            }
+            isPlaying = !isPlaying;
+        }
+    </script>
+</body>
+</html>

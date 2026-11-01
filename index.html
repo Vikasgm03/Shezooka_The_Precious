@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encrypted Invitation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --cyan: #00f3ff;
+            --deep-bg: #050510;
+        }
+
+        body {
+            background-color: var(--deep-bg);
+            color: white;
+            font-family: 'Cinzel', serif; /* Classic font */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* --- BACKGROUND GRID (Sci-Fi) --- */
+        .grid-bg {
+            position: absolute; inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            perspective: 500px;
+            transform-style: preserve-3d;
+            animation: moveGrid 20s linear infinite;
+            z-index: 0;
+        }
+        @keyframes moveGrid { 0% { transform: translateY(0); } 100% { transform: translateY(50px); } }
+
+        /* --- THE INVITATION CARD (Glassmorphism) --- */
+        .card-container {
+            perspective: 1500px;
+            z-index: 10;
+        }
+
+        .holo-card {
+            width: 340px;
+            height: 500px;
+            background: rgba(10, 10, 20, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.3); /* Gold border */
+            border-radius: 12px;
+            box-shadow: 
+                0 0 30px rgba(0, 0, 0, 0.8),
+                0 0 10px rgba(212, 175, 55, 0.1),
+                inset 0 0 20px rgba(0, 243, 255, 0.05); /* Cyan inner glow */
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Elegant Corners */
+        .corner {
+            position: absolute;
+            width: 40px; height: 40px;
+            border: 2px solid var(--gold);
+            transition: all 0.3s;
+        }
+        .tl { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
+        .tr { top: 10px; right: 10px; border-left: 0; border-bottom: 0; }
+        .bl { bottom: 10px; left: 10px; border-right: 0; border-top: 0; }
+        .br { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
+
+        /* --- THE DIGITAL SEAL (The Lock) --- */
+        .seal-wrapper {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .seal-wrapper:hover { transform: scale(1.1); }
+
+        .digital-wax {
+            width: 100px; height: 100px;
+            background: radial-gradient(circle, #2e1065 0%, #000 100%);
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            position: relative;
+            z-index: 20;
+        }
+
+        .hologram-ring {
+            position: absolute;
+            top: -10px; left: -10px; right: -10px; bottom: -10px;
+            border: 1px dashed var(--cyan);
+            border-radius: 50%;
+            animation: spin 10s linear infinite;
+            opacity: 0.5;
+        }
+
+        .seal-icon {
+            font-size: 40px;
+            color: var(--gold);
+            text-shadow: 0 0 10px var(--gold);
+        }
+
+        /* --- CONTENT (Hidden) --- */
+        .hidden-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            background: rgba(0,0,0,0.8);
+            border-radius: 12px;
+        }
+
+        .glitch-text {
+            font-family: 'Orbitron', sans-serif; /* Sci-Fi Font */
+            color: var(--cyan);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .invite-title {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .enter-btn {
+            margin-top: 30px;
+            padding: 12px 30px;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .enter-btn::before {
+            content: '';
+            position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+            transition: 0.5s;
+        }
+        .enter-btn:hover::before { left: 100%; }
+        .enter-btn:hover { box-shadow: 0 0 20px var(--gold); background: rgba(212, 175, 55, 0.1); }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+    <div style="position: absolute; inset: 0; background: radial-gradient(circle, transparent 0%, #050510 80%); z-index: 1;"></div>
+
+    <div class="card-container">
+        <div class="holo-card" id="card">
+            
+            <div class="corner tl"></div>
+            <div class="corner tr"></div>
+            <div class="corner bl"></div>
+            <div class="corner br"></div>
+
+            <div class="seal-wrapper" id="seal" onclick="decrypt()">
+                <div class="hologram-ring"></div>
+                <div class="hologram-ring" style="width: 140%; height: 140%; top: -20%; left: -20%; border-color: var(--gold); animation-direction: reverse; opacity: 0.3;"></div>
+                
+                <div class="digital-wax">
+                    <i class="fas fa-fingerprint seal-icon"></i>
+                </div>
+                
+                <p class="mt-4 text-[10px] tracking-[0.4em] text-cyan-400 font-[Orbitron] uppercase text-center">Touch to Decrypt</p>
+            </div>
+
+            <div class="hidden-content" id="content">
+                <div class="glitch-text">ACCESS GRANTED</div>
+                <div class="w-16 h-0.5 bg-cyan-500 mb-6"></div>
+                <h1 class="invite-title">Nithya</h1>
+                <p class="text-gray-300 text-sm leading-relaxed font-sans">
+                    The stars have aligned.<br>
+                    Your timeline awaits.<br>
+                    Proceed to the celebration.
+                </p>
+                <button class="enter-btn" onclick="warp()">ENTER</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Use GSAP for smooth animations
+        function decrypt() {
+            const seal = document.getElementById('seal');
+            const card = document.getElementById('card');
+            const content = document.getElementById('content');
+            const corners = document.querySelectorAll('.corner');
+
+            // 1. Seal Unlocking Animation
+            gsap.to(seal, { scale: 0, opacity: 0, duration: 0.8, ease: "back.in(1.7)" });
+
+            // 2. Expand Corners (Sci-Fi Activation)
+            gsap.to('.tl', { x: -20, y: -20, duration: 0.5 });
+            gsap.to('.tr', { x: 20, y: -20, duration: 0.5 });
+            gsap.to('.bl', { x: -20, y: 20, duration: 0.5 });
+            gsap.to('.br', { x: 20, y: 20, duration: 0.5 });
+
+            // 3. Card Glow Up
+            gsap.to(card, { 
+                boxShadow: "0 0 50px rgba(0, 243, 255, 0.4), 0 0 20px rgba(212, 175, 55, 0.2)",
+                duration: 1
+            });
+
+            // 4. Reveal Content
+            content.style.pointerEvents = "auto";
+            gsap.to(content, { opacity: 1, duration: 1, delay: 0.5 });
+        }
+
+        function warp() {
+            // Warp Speed Transition
+            gsap.to(".card-container", { scale: 50, opacity: 0, duration: 1.5, ease: "expo.in" });
+            gsap.to("body", { backgroundColor: "#fff9f0", duration: 1.2, delay: 0.5 });
+            
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 1500);
+        }
+
+        // Slight 3D Tilt Effect on Mouse Move
+        document.addEventListener('mousemove', (e) => {
+            const card = document.querySelector('.holo-card');
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Make a Wish • Nithya</title>
+   
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+   
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Great+Vibes&family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;500;600&display=swap" rel="stylesheet">
+   
+    <style>
+        :root {
+            --lavender: #d4b8f0;
+            --gold: #d4af37;
+        }
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #0a030f;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            user-select: none;
+            touch-action: none;
+        }
+        #cake-container {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            cursor: none;
+        }
+        .bg-particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at 30% 20%, rgba(212,184,240,0.12) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(212,175,55,0.06) 0%, transparent 60%);
+            animation: twinkle 12s infinite alternate ease-in-out;
+        }
+        @keyframes twinkle { 0% { opacity: 0.65; } 100% { opacity: 1; } }
+
+        .ui-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 30;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 1.5rem;
+        }
+        .title h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.8rem, 9vw, 5.8rem);
+            color: #d4b8f0;
+            text-shadow: 0 0 45px rgba(212,184,240,0.7);
+        }
+        .instruction-pill {
+            position: absolute;
+            bottom: 7%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10,3,15,0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(212,184,240,0.5);
+            padding: 14px 38px;
+            border-radius: 9999px;
+            font-family: 'Cinzel', serif;
+            color: #d4b8f0;
+            font-size: 1rem;
+            letter-spacing: 0.15em;
+            box-shadow: 0 0 40px rgba(212,184,240,0.3);
+            pointer-events: none;
+        }
+        .hand-icon {
+            display: inline-block;
+            animation: sliceHint 1.6s infinite ease-in-out;
+        }
+        @keyframes sliceHint {
+            0%, 100% { transform: translateX(-8px) rotate(-12deg); }
+            50% { transform: translateX(12px) rotate(12deg); }
+        }
+        .celebration-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            text-align: center;
+            z-index: 50;
+            pointer-events: none;
+        }
+        .bday-msg {
+            font-family: 'Great Vibes', cursive;
+            font-size: clamp(4.8rem, 15vw, 10rem);
+            line-height: 0.88;
+            background: linear-gradient(180deg, #fff, #d4b8f0);
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 70px rgba(212,184,240,0.9);
+        }
+        .bday-name {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(1.9rem, 6.5vw, 3.8rem);
+            letter-spacing: 0.7em;
+            color: #ffd700;
+            margin-top: -12px;
+        }
+        .back-btn {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 100;
+            padding: 10px 24px;
+            border: 1px solid rgba(212,184,240,0.5);
+            border-radius: 9999px;
+            color: #d4b8f0;
+            font-size: 0.82rem;
+            letter-spacing: 0.2em;
+            transition: all 0.4s ease;
+        }
+        .back-btn:hover {
+            background: #d4b8f0;
+            color: #0a030f;
+        }
+        #knife-cursor {
+            position: absolute;
+            width: 46px;
+            height: 118px;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0;
+            transition: transform 0.05s linear;
+            filter: drop-shadow(0 0 10px #d4b8f0);
+        }
+    </style>
+</head>
+<body>
+    <audio id="slice-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/2754/2754-preview.mp3" type="audio/mp3">
+    </audio>
+    <audio id="bday-audio" preload="auto">
+        <source src="media/happy_birthday.mp3" type="audio/mp3">
+    </audio>
+
+    <a href="index.html" class="back-btn font-cinematic">← RETURN</a>
+
+    <div class="bg-particles"></div>
+   
+    <div class="ui-layer">
+        <div class="title text-center w-full mt-6">
+            <h1 class="opacity-0">Make a Wish,Nithyaa </h1>
+        </div>
+       
+        <div class="instruction-pill flex items-center gap-3 text-center" id="hint-text">
+            DRAG TO CUT THE CAKE <span class="hand-icon text-3xl">🔪</span>
+        </div>
+    </div>
+
+    <div class="celebration-text" id="celebration">
+        <h1 class="bday-msg">Happy Birthday</h1>
+        <p class="bday-name">Nithyaa✨</p>
+    </div>
+
+    <div id="cake-container"></div>
+    <img id="knife-cursor" src="https://i.ibb.co/8XvY0vZ/knife-cursor.png" alt="knife">
+
+    <script>
+        // ====================== MOBILE OPTIMIZED LAVENDER CAKE ======================
+        const container = document.getElementById('cake-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0a030f, 0.028);
+
+        const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 5.8, 12.5);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        // Mobile detection for performance
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+
+        // ====================== LIGHTING ======================
+        scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+
+        const mainLight = new THREE.SpotLight(0xfff0d0, 3.5, 0, Math.PI / 3, 0.4);
+        mainLight.position.set(9, 19, 11);
+        mainLight.castShadow = true;
+        mainLight.shadow.mapSize.width = isMobile ? 512 : 1024;
+        mainLight.shadow.mapSize.height = isMobile ? 512 : 1024;
+        scene.add(mainLight);
+
+        const candleLights = [];
+
+        // ====================== LAVENDER CAKE (realistic + optimized) ======================
+        const cake = new THREE.Group();
+        scene.add(cake);
+
+        const cakeMat = new THREE.MeshPhongMaterial({ 
+            color: 0xd4b8f0,      // LAVENDER
+            shininess: 14,
+            specular: 0xffffff 
+        });
+        const chocolateMat = new THREE.MeshPhongMaterial({ color: 0x3a2a25, shininess: 8 });
+        const goldMat = new THREE.MeshPhongMaterial({ color: 0xd4af37, shininess: 85, specular: 0xffffff });
+
+        // Tiers (lower poly on mobile)
+        const segments = isMobile ? 48 : 96;
+        const tier1 = new THREE.Mesh(new THREE.CylinderGeometry(3.75, 3.9, 1.65, segments), cakeMat);
+        tier1.castShadow = true; tier1.receiveShadow = true;
+        cake.add(tier1);
+
+        const tier2 = new THREE.Mesh(new THREE.CylinderGeometry(2.8, 2.95, 1.3, segments), chocolateMat);
+        tier2.position.y = 1.48;
+        cake.add(tier2);
+
+        const tier3 = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 2.15, 1.1, segments), cakeMat);
+        tier3.position.y = 2.68;
+        cake.add(tier3);
+
+        const tier4 = new THREE.Mesh(new THREE.CylinderGeometry(1.35, 1.45, 0.95, segments), chocolateMat);
+        tier4.position.y = 3.68;
+        cake.add(tier4);
+
+        // Gold drips + pearls (fewer on mobile)
+        for (let i = 0; i < (isMobile ? 5 : 8); i++) {
+            const drip = new THREE.Mesh(new THREE.TorusGeometry(2.9 + i*0.05, 0.08, 16, 48), goldMat);
+            drip.rotation.x = Math.PI / 2;
+            drip.position.y = 1.48 + Math.random() * 0.65;
+            drip.rotation.z = Math.random() * Math.PI;
+            cake.add(drip);
+        }
+
+        // Sprinkles (heavily reduced on mobile)
+        const sprinkleCount = isMobile ? 65 : 160;
+        const sprinkleMat = new THREE.MeshPhongMaterial({ color: 0xff69b4 });
+        for (let i = 0; i < sprinkleCount; i++) {
+            const sprinkle = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.2, 8), sprinkleMat);
+            sprinkle.position.set((Math.random()-0.5)*7.2, 0.85 + Math.random()*3.5, (Math.random()-0.5)*7.2);
+            sprinkle.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+            cake.add(sprinkle);
+        }
+
+        // 9 candles
+        const candles = [];
+        for (let i = 0; i < 9; i++) {
+            const candle = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 1.3, 20), new THREE.MeshPhongMaterial({ color: 0xfff8e1 }));
+            const angle = (i / 9) * Math.PI * 2 + 0.3;
+            candle.position.set(Math.cos(angle) * 1.08, 4.5, Math.sin(angle) * 1.08);
+            cake.add(candle);
+            candles.push(candle);
+
+            const light = new THREE.PointLight(0xffaa44, 2.3, 8);
+            light.position.set(candle.position.x, candle.position.y + 1.25, candle.position.z);
+            scene.add(light);
+            candleLights.push(light);
+        }
+
+        // Animated flames (canvas optimized)
+        const flameGroup = new THREE.Group();
+        cake.add(flameGroup);
+        const flames = [];
+        candles.forEach((c, i) => {
+            const canvas = document.createElement('canvas'); canvas.width = canvas.height = 48;
+            const ctx = canvas.getContext('2d');
+            const tex = new THREE.CanvasTexture(canvas);
+            const mat = new THREE.SpriteMaterial({ map: tex, blending: THREE.AdditiveBlending, transparent: true });
+            const flame = new THREE.Sprite(mat);
+            flame.scale.set(0.62, 0.95, 1);
+            flame.position.copy(c.position);
+            flame.position.y += 1.75;
+            flameGroup.add(flame);
+            flames.push({sprite: flame, ctx, tex});
+        });
+
+        function animateFlames(t) {
+            flames.forEach((f, i) => {
+                const ctx = f.ctx;
+                ctx.clearRect(0,0,48,48);
+                const g = ctx.createRadialGradient(24,24,2,24,19,24);
+                g.addColorStop(0, `rgba(255,240,140,${0.95 + Math.sin(t*20 + i)*0.1})`);
+                g.addColorStop(0.4, `rgba(255,110,40,${0.75 + Math.cos(t*14 + i)*0.2})`);
+                g.addColorStop(1, 'rgba(255,30,10,0)');
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.ellipse(24, 24, 14, 26, Math.sin(t*7 + i)*0.2, 0, Math.PI*2);
+                ctx.fill();
+                f.tex.needsUpdate = true;
+            });
+        }
+
+        // ====================== 3D KNIFE + TRAIL ======================
+        const knife = new THREE.Group();
+        scene.add(knife);
+
+        const blade = new THREE.Mesh(
+            new THREE.BoxGeometry(0.08, 3.3, 0.6),
+            new THREE.MeshPhongMaterial({ color: 0xeeeeee, shininess: 100 })
+        );
+        blade.rotation.x = Math.PI / 2;
+        blade.position.y = 1.65;
+        knife.add(blade);
+
+        const handle = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.12, 0.14, 1.4, 16),
+            new THREE.MeshPhongMaterial({ color: 0xd4b8f0 })
+        );
+        handle.rotation.x = Math.PI / 2;
+        handle.position.y = 0.18;
+        knife.add(handle);
+
+        knife.visible = false;
+
+        // ====================== INTERACTION & CUTTING ======================
+        let isDragging = false;
+        let cutProgress = 0;
+        let hasCut = false;
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        const sliceSound = document.getElementById('slice-sound');
+        const bdayAudio = document.getElementById('bday-audio');
+
+        let audioPrimed = false;
+        function primeAudio() {
+            if (audioPrimed) return;
+            bdayAudio.play().then(() => {
+                bdayAudio.pause();
+                bdayAudio.currentTime = 0;
+                audioPrimed = true;
+            }).catch(() => {});
+        }
+
+        function onPointerDown(e) {
+            primeAudio();
+            if (hasCut) return;
+            isDragging = true;
+            knife.visible = true;
+            updateKnifePosition(e);
+            cutProgress = 0;
+        }
+
+        function onPointerMove(e) {
+            if (!isDragging || hasCut) return;
+            updateKnifePosition(e);
+            cutProgress = Math.min(cutProgress + 0.045, 1);
+            knife.rotation.z = (cutProgress - 0.5) * 0.65;
+
+            if (Math.random() < (isMobile ? 0.25 : 0.45)) createCrumbs();
+        }
+
+        function updateKnifePosition(e) {
+            const rect = container.getBoundingClientRect();
+            mouse.x = ((e.clientX || (e.touches && e.touches[0].clientX)) - rect.left) / rect.width * 2 - 1;
+            mouse.y = -((e.clientY || (e.touches && e.touches[0].clientY)) - rect.top) / rect.height * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -1.85);
+            const point = new THREE.Vector3();
+            raycaster.ray.intersectPlane(plane, point);
+
+            if (point) {
+                knife.position.copy(point);
+                knife.position.y = 3.9 + Math.sin(Date.now()/220) * 0.12;
+                knife.lookAt(point.x * 1.25, 0, point.z * 1.25);
+            }
+        }
+
+        function createCrumbs() {
+            for (let i = 0; i < (isMobile ? 3 : 6); i++) {
+                const crumb = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), new THREE.MeshPhongMaterial({ color: 0xd4b8f0 }));
+                crumb.position.copy(knife.position);
+                crumb.position.y -= 0.5;
+                scene.add(crumb);
+                gsap.to(crumb.position, {
+                    y: "-=4.5",
+                    x: (Math.random()-0.5)*4,
+                    z: (Math.random()-0.5)*4,
+                    duration: 1.5,
+                    ease: "power2.out",
+                    onComplete: () => scene.remove(crumb)
+                });
+            }
+        }
+
+        function onPointerUp() {
+            if (!isDragging || hasCut) return;
+            isDragging = false;
+
+            if (cutProgress > 0.68) {
+                hasCut = true;
+                triggerLavenderCut();
+            } else {
+                knife.visible = false;
+            }
+        }
+
+        function triggerLavenderCut() {
+            sliceSound.currentTime = 0;
+            sliceSound.play();
+
+            gsap.to(knife.position, { y: 0.7, duration: 0.55, ease: "back.in(1.8)" });
+            gsap.to(knife.rotation, { z: -1.3, duration: 0.85 });
+
+            setTimeout(() => {
+                const left = cake.clone();
+                const right = cake.clone();
+                scene.add(left);
+                scene.add(right);
+                scene.remove(cake);
+
+                gsap.to(left.position, { x: -3.8, duration: 2.2, ease: "power3.out" });
+                gsap.to(right.position, { x: 3.8, duration: 2.2, ease: "power3.out" });
+                gsap.to(left.rotation, { y: -0.75, duration: 2.6 });
+                gsap.to(right.rotation, { y: 0.75, duration: 2.6 });
+            }, 380);
+
+            setTimeout(launchCelebration, 700);
+        }
+
+        function launchCelebration() {
+            // MUSIC STARTS HERE — right after cut
+            bdayAudio.volume = 0.78;
+            bdayAudio.play();
+
+            gsap.to('.instruction-pill', { opacity: 0, y: 35, duration: 0.9 });
+            gsap.to(knife, { visible: false });
+
+            // Camera zoom for mobile
+            gsap.to(camera.position, { z: 19, y: 8.5, duration: 3.8, ease: "power2.inOut" });
+
+            // Confetti
+            const colors = ['#d4b8f0', '#d4af37', '#ff69b4', '#ffffff'];
+            const burst = setInterval(() => {
+                confetti({
+                    particleCount: isMobile ? 90 : 160,
+                    spread: 85,
+                    origin: { x: Math.random(), y: 0.3 },
+                    colors
+                });
+            }, isMobile ? 220 : 140);
+            setTimeout(() => clearInterval(burst), 4200);
+
+            // Reveal text
+            gsap.to('#celebration', {
+                scale: 1,
+                opacity: 1,
+                duration: 2.6,
+                ease: "elastic.out(1, 0.5)",
+                delay: 0.5
+            });
+        }
+
+        // ====================== ANIMATION LOOP ======================
+        let clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const t = clock.getElapsedTime();
+
+            cake.rotation.y = Math.sin(t * 0.32) * 0.025;
+            cake.position.y = Math.sin(t * 0.8) * 0.06;
+
+            candleLights.forEach((l, i) => l.intensity = 2.1 + Math.sin(t * 19 + i) * 0.55);
+            animateFlames(t);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // ====================== TOUCH & MOUSE ======================
+        container.addEventListener('mousedown', onPointerDown);
+        container.addEventListener('mousemove', onPointerMove);
+        container.addEventListener('mouseup', onPointerUp);
+        container.addEventListener('touchstart', onPointerDown);
+        container.addEventListener('touchmove', onPointerMove);
+        container.addEventListener('touchend', onPointerUp);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // ====================== INTRO ======================
+        gsap.to('.title h1', { opacity: 1, y: 0, duration: 2, delay: 0.3, ease: "power3.out" });
+        gsap.to('.instruction-pill', { opacity: 1, scale: 1, duration: 1.8, delay: 1.6 });
+
+        setTimeout(() => {
+            document.getElementById('knife-cursor').style.opacity = '0.28';
+        }, 2400);
+    </script>
+</body>
+</html>

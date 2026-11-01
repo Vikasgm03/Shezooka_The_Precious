@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Echoes of Love | Nithya's Birthday Wishes ✨</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Dancing+Script:wght@400;700&family=Montserrat:wght@300;400&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root { 
+            --gold: #f8d1e0; 
+            --rose: #f9a8d4; 
+            --bg: #0a0305; 
+        }
+        html, body { 
+            width: 100%; 
+            overflow-x: hidden; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--bg); 
+            color: #fff; 
+            font-family: 'Montserrat', sans-serif; 
+            cursor: none; 
+        }
+
+        /* SCROLL LOCK */
+        body.scroll-locked {
+            overflow: hidden !important;
+            height: 100vh !important;
+            touch-action: none;
+        }
+
+        .font-cinematic { font-family: 'Cinzel', serif; }
+        .font-hand { font-family: 'Dancing Script', cursive; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+
+        /* PREMIUM CURSOR */
+        .cursor-dot, .cursor-outline { 
+            position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); 
+            border-radius: 50%; z-index: 99999; pointer-events: none; 
+        }
+        .cursor-dot { width: 10px; height: 10px; background: #f8d1e0; box-shadow: 0 0 15px #f9a8d4; }
+        .cursor-outline { 
+            width: 44px; height: 44px; 
+            border: 1.5px solid rgba(248, 209, 224, 0.6); 
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1); 
+        }
+
+        /* HEART PARTICLES */
+        .heart-particle { 
+            position: absolute; color: #f9a8d4; font-size: 22px; 
+            pointer-events: none; z-index: 10; 
+            animation: floatHeart 9s linear infinite; 
+            text-shadow: 0 0 15px #f8d1e0;
+        }
+        @keyframes floatHeart { 
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 
+            10% { opacity: 1; } 
+            90% { opacity: 1; } 
+            100% { transform: translateY(-120vh) rotate(380deg); opacity: 0; } 
+        }
+
+        /* FILM GRAIN */
+        .film-grain::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.035;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+            z-index: 9999;
+        }
+
+        /* ROMANTIC VIDEO CARD */
+        .video-card {
+            background: rgba(15, 5, 12, 0.65);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(249,168,212,0.15);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+        .video-card:hover {
+            transform: translateY(-14px) scale(1.02);
+            border-color: rgba(249,168,212,0.5);
+            box-shadow: 0 30px 60px rgba(249,168,212,0.25);
+        }
+        .preview-vid {
+            filter: brightness(85%) saturate(90%) contrast(110%);
+            transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .video-card:hover .preview-vid {
+            filter: brightness(105%) saturate(120%) contrast(100%);
+            transform: scale(1.08);
+        }
+
+        /* BLOOM EFFECT */
+        .video-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(249,168,212,0.18), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.6s;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .video-card:hover::before { opacity: 1; }
+
+        /* SECTION TITLE */
+        .section-title { 
+            font-family: 'Cinzel', serif; 
+            font-size: 3.2rem; 
+            text-align: center; 
+            background: linear-gradient(90deg, #f8d1e0, #f9a8d4, #f8d1e0); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+
+        .confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; pointer-events: none; }
+    </style>
+</head>
+<body class="film-grain relative overflow-hidden scroll-locked">
+    <div class="cursor-dot hidden md:block"></div>
+    <div class="cursor-outline hidden md:block"></div>
+
+    <canvas id="confetti" class="confetti-canvas"></canvas>
+
+    <div id="hearts" class="fixed inset-0 pointer-events-none z-10"></div>
+
+    <div id="gate-left" class="fixed top-0 left-0 w-1/2 h-screen bg-[#0a0305] z-[99999] flex items-center justify-end">
+        <div class="w-1 h-40 bg-gradient-to-b from-transparent via-[#f9a8d4] to-transparent"></div>
+    </div>
+    <div id="gate-right" class="fixed top-0 right-0 w-1/2 h-screen bg-[#0a0305] z-[99999] flex items-center justify-start">
+        <div class="w-1 h-40 bg-gradient-to-b from-transparent via-[#f9a8d4] to-transparent"></div>
+    </div>
+    <div id="entrance-text" class="fixed inset-0 z-[100000] flex items-center justify-center pointer-events-none">
+        <p class="font-hand text-[#f9a8d4] text-4xl tracking-widest">With all my love...</p>
+    </div>
+
+    <a href="home.html?skipIntro=true#wishes-anchor" 
+       class="fixed top-6 left-6 z-50 text-white/60 hover:text-[#f9a8d4] transition-all flex items-center gap-3 group cursor-pointer">
+        <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center backdrop-blur-md group-hover:border-[#f9a8d4]">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+        <span class="tracking-[0.3em] text-xs uppercase font-cinematic opacity-0 group-hover:opacity-100">Back to Gallery</span>
+    </a>
+
+    <header class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,#f9a8d420_0%,transparent_70%)]"></div>
+        
+        <div class="relative z-10 text-center px-6 max-w-3xl">
+            <div class="mb-6">
+                <span class="px-6 py-2 rounded-full border border-[#f9a8d4]/30 text-[#f9a8d4] text-xs tracking-[0.4em] font-medium">18 MARCH 2026</span>
+            </div>
+            <h1 class="text-[7.5vw] md:text-8xl font-cinematic leading-none mb-4">
+                ECHOES OF <span class="font-hand text-[#f9a8d4] block text-[11vw] md:text-[9rem] -mt-6">love</span>
+            </h1>
+            <p class="text-3xl md:text-4xl font-hand text-[#f8d1e0] tracking-wider">For Nithya, from the hearts that adore you</p>
+        </div>
+
+        <div onclick="document.getElementById('wishes-section').scrollIntoView({behavior:'smooth'})" 
+             class="absolute bottom-12 cursor-pointer flex flex-col items-center gap-3">
+            <div class="text-xs tracking-[0.3em] text-[#f9a8d4]">SCROLL FOR WISHES</div>
+            <i class="fas fa-chevron-down text-[#f9a8d4] animate-bounce"></i>
+        </div>
+    </header>
+
+    <section id="wishes-section" class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="section-title mb-16">Messages from the Heart</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="video-card group cursor-pointer" onclick="playFullVideo('media/videos/h4.mp4', 'A LITTLE VOICE')">
+                    <div class="aspect-[4/5] relative overflow-hidden">
+                        <video src="media/videos/h4.mp4" class="preview-vid w-full h-full object-cover" muted loop playsinline></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-8 left-8 right-8">
+                            <div class="text-[#f9a8d4] text-xs font-medium tracking-widest">A LITTLE VOICE</div>
+                            <h3 class="text-3xl font-cinematic">A LITTLE VOICE</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card group cursor-pointer" onclick="playFullVideo('media/videos/h2.mp4', 'A Sweet Wish')">
+                    <div class="aspect-[4/5] relative overflow-hidden">
+                        <video src="media/videos/h2.mp4" class="preview-vid w-full h-full object-cover" muted loop playsinline></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-8 left-8 right-8">
+                            <div class="text-[#f9a8d4] text-xs font-medium tracking-widest">FROM A STRANGER</div>
+                            <h3 class="text-3xl font-cinematic">A Sweet Wish</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card group cursor-pointer" onclick="playFullVideo('media/videos/h1.mp4', 'A RANDOM SMILE')">
+                    <div class="aspect-[4/5] relative overflow-hidden">
+                        <video src="media/videos/h1.mp4" class="preview-vid w-full h-full object-cover" muted loop playsinline></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-8 left-8 right-8">
+                            <div class="text-[#f9a8d4] text-xs font-medium tracking-widest">A RANDOM SMILE</div>
+                            <h3 class="text-3xl font-cinematic">Carrying a Wish</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card group cursor-pointer" onclick="playFullVideo('media/videos/h5.mp4', 'Wishing You Joy')">
+                    <div class="aspect-[4/5] relative overflow-hidden">
+                        <video src="media/videos/h5.mp4" class="preview-vid w-full h-full object-cover" muted loop playsinline></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-8 left-8 right-8">
+                            <div class="text-[#f9a8d4] text-xs font-medium tracking-widest">SOMEONE OUT THERE</div>
+                            <h3 class="text-3xl font-cinematic">Wishing You Joy</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card group cursor-pointer" onclick="playFullVideo('media/videos/h6.mp4', 'A SMALL MOMENT')">
+                    <div class="aspect-[4/5] relative overflow-hidden">
+                        <video src="media/videos/h6.mp4" class="preview-vid w-full h-full object-cover" muted loop playsinline></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-8 left-8 right-8">
+                            <div class="text-[#f9a8d4] text-xs font-medium tracking-widest">A SMALL MOMENT</div>
+                            <h3 class="text-3xl font-cinematic">Big Smiles</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card group cursor-pointer" onclick="playFullVideo('media/videos/h7.mp4', 'A SHARED SILENCE')">
+                    <div class="aspect-[4/5] relative overflow-hidden">
+                        <video src="media/videos/h7.mp4" class="preview-vid w-full h-full object-cover" muted loop playsinline></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-8 left-8 right-8">
+                            <div class="text-[#f9a8d4] text-xs font-medium tracking-widest">A SHARED SILENCE</div>
+                            <h3 class="text-3xl font-cinematic">Not Quite a Stranger</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="video-card group cursor-pointer" onclick="playFullVideo('media/videos/h3.mp4', 'Just For You')">
+                    <div class="aspect-[4/5] relative overflow-hidden">
+                        <video src="media/videos/h3.mp4" class="preview-vid w-full h-full object-cover" muted loop playsinline></video>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-8 left-8 right-8">
+                            <div class="text-[#f9a8d4] text-xs font-medium tracking-widest">AN UNEXPECTED WISH</div>
+                            <h3 class="text-3xl font-cinematic">Just For You</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <div id="cinema-modal" class="fixed inset-0 z-[200000] hidden flex items-center justify-center p-4 bg-black/95">
+        <button onclick="closeModal()" 
+                class="absolute top-8 right-8 text-5xl text-white/60 hover:text-[#f9a8d4] transition-colors z-50 cursor-pointer">&times;</button>
+        
+        <div class="w-full max-w-5xl relative">
+            <h2 id="modal-title" class="text-4xl font-cinematic text-center mb-8 text-[#f9a8d4]"></h2>
+            
+            <div class="aspect-video bg-black rounded-3xl overflow-hidden border border-[#f9a8d4]/20 shadow-2xl">
+                <video id="main-player" class="w-full h-full" controls autoplay playsinline>
+                    <source src="" type="video/mp4">
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const isMobile = window.innerWidth < 768;
+
+        // Lenis smooth scroll
+        let lenis;
+        if (!isMobile) {
+            lenis = new Lenis({ duration: 1.4, smoothWheel: true });
+            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+            requestAnimationFrame(raf);
+            lenis.stop(); // Lock lenis at start
+        }
+
+        // Custom cursor
+        const dot = document.querySelector('.cursor-dot');
+        const outline = document.querySelector('.cursor-outline');
+        if (!isMobile && dot && outline) {
+            document.addEventListener('mousemove', e => {
+                dot.style.left = `${e.clientX}px`;
+                dot.style.top = `${e.clientY}px`;
+                outline.style.left = `${e.clientX}px`;
+                outline.style.top = `${e.clientY}px`;
+            });
+        }
+
+        // Floating hearts
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart-particle';
+            heart.textContent = ['♥','♡','✧'][Math.floor(Math.random()*3)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 7 + 8) + 's';
+            document.getElementById('hearts').appendChild(heart);
+            setTimeout(() => heart.remove(), 18000);
+        }
+        setInterval(createHeart, 220);
+
+        // Confetti
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const colors = ['#f9a8d4', '#f8d1e0', '#fff', '#fda4af'];
+            let particles = [];
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * -canvas.height;
+                    this.size = Math.random() * 11 + 6;
+                    this.speed = Math.random() * 5 + 4;
+                    this.angle = Math.random() * 360;
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                }
+                update() {
+                    this.y += this.speed;
+                    this.angle += 3;
+                }
+                draw() {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.angle * Math.PI / 180);
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                    ctx.restore();
+                }
+            }
+
+            for (let i = 0; i < 280; i++) particles.push(new Particle());
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach((p, i) => {
+                    p.update();
+                    p.draw();
+                    if (p.y > canvas.height) particles.splice(i, 1);
+                });
+                if (particles.length > 20) requestAnimationFrame(animate);
+                else canvas.style.opacity = '0';
+            }
+            animate();
+        }
+
+        // Gate animation & Scroll Unlock
+        window.onload = () => {
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    document.body.classList.remove('scroll-locked'); // Unlock mobile scroll
+                    if (lenis) lenis.start(); // Unlock desktop scroll
+                }
+            });
+
+            tl.to("#entrance-text", { opacity: 0, duration: 0.8, delay: 0.6 })
+              .to("#gate-left", { x: "-100%", duration: 1.8, ease: "power3.inOut" }, "open")
+              .to("#gate-right", { x: "100%", duration: 1.8, ease: "power3.inOut" }, "open")
+              .to(".video-card", { opacity: 1, y: 0, stagger: 0.1, duration: 1.2, ease: "power3.out" }, "open+=0.6");
+
+            // Auto confetti
+            setTimeout(() => {
+                launchConfetti();
+            }, 1200);
+
+            // Preview video hover play
+            if (!isMobile) {
+                document.querySelectorAll('.video-card').forEach(card => {
+                    const vid = card.querySelector('video');
+                    if (vid) {
+                        card.addEventListener('mouseenter', () => vid.play());
+                        card.addEventListener('mouseleave', () => { vid.pause(); vid.currentTime = 0; });
+                    }
+                });
+            }
+        };
+
+        // Modal
+        let modal, player, modalTitle;
+        window.playFullVideo = (source, name) => {
+            if (!modal) {
+                modal = document.getElementById('cinema-modal');
+                player = document.getElementById('main-player');
+                modalTitle = document.getElementById('modal-title');
+            }
+            modalTitle.textContent = name;
+            player.src = source;
+            modal.classList.remove('hidden');
+            player.play().catch(e=>{});
+            if (lenis) lenis.stop();
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeModal = () => {
+            if(!modal) return;
+            modal.classList.add('hidden');
+            player.pause();
+            player.src = '';
+            if (lenis) lenis.start();
+            document.body.style.overflow = '';
+        };
+
+        // Close modal on escape
+        document.addEventListener('keydown', e => {
+            if (e.key === "Escape" && modal && !modal.classList.contains('hidden')) closeModal();
+        });
+    </script>
+</body>
+</html>

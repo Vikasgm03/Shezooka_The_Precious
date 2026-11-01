@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Birthday Chronicles | Time Travel</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Great+Vibes&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+
+    <style>
+        /* --- CORE STYLES --- */
+        :root { --gold: #d4af37; --deep: #0f0518; }
+        body { background-color: var(--deep); color: #fff; font-family: 'Montserrat', sans-serif; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        .font-cinematic { font-family: 'Cormorant Garamond', serif; }
+        .font-emotional { font-family: 'Great Vibes', cursive; }
+        
+        /* Smooth Scroll */
+        @media (min-width: 769px) {
+            html.lenis { height: auto; } 
+            .lenis.lenis-smooth { scroll-behavior: auto; } 
+            .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; } 
+            .lenis.lenis-stopped { overflow: hidden; } 
+        }
+
+        /* SCROLL LOCK CLASSS */
+        body.scroll-locked { overflow: hidden !important; height: 100vh !important; touch-action: none; }
+
+        /* --- CUSTOM CURSOR --- */
+        @media (hover: hover) and (pointer: fine) {
+            .cursor-dot { position: fixed; top: 0; left: 0; width: 8px; height: 8px; background-color: var(--gold); border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate(-50%, -50%); }
+            .cursor-outline { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border: 1px dashed rgba(212, 175, 55, 0.5); border-radius: 50%; z-index: 10000; pointer-events: none; transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s; }
+            body { cursor: none; }
+        }
+
+        /* --- FILM GRAIN (Optimized) --- */
+        .film-grain::after {
+            content: ""; position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.04; pointer-events: none; mix-blend-mode: overlay; z-index: 9999;
+        }
+
+        /* --- THE GATE ENTRANCE --- */
+        .gate { position: fixed; top: 0; width: 50vw; height: 100vh; background: #030105; z-index: 100000; display: flex; align-items: center; will-change: transform; }
+        #gate-left { left: 0; border-right: 1px solid rgba(212,175,55,0.2); justify-content: flex-end; box-shadow: inset -30px 0 60px rgba(0,0,0,0.8); }
+        #gate-right { right: 0; border-left: 1px solid rgba(212,175,55,0.2); justify-content: flex-start; box-shadow: inset 30px 0 60px rgba(0,0,0,0.8); }
+        #gate-flash {
+            position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 2px; height: 0%; background: #fff;
+            box-shadow: 0 0 40px 10px rgba(212,175,55,0.8), 0 0 80px 20px rgba(255,255,255,0.6); z-index: 100001; opacity: 0; pointer-events: none;
+        }
+        .portal-ring { position: absolute; border-radius: 50%; border: 1px solid rgba(212, 175, 55, 0.2); transform: scale(0); box-shadow: inset 0 0 20px rgba(212, 175, 55, 0.1); }
+
+        /* --- LIGHTWEIGHT CSS PARTICLES --- */
+        .dust { position: fixed; background: #fff; border-radius: 50%; pointer-events: none; opacity: 0; animation: floatUp var(--dur) ease-in-out infinite alternate; z-index: 0; will-change: transform, opacity; }
+        .sand-grain { position: fixed; width: 2px; height: 8px; background: linear-gradient(to bottom, transparent, #d4af37, transparent); border-radius: 50%; opacity: 0; animation: fallDown var(--dur) linear infinite; z-index: 0; pointer-events: none; will-change: transform, opacity; }
+        
+        @keyframes floatUp { 0% { transform: translateY(0); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: translateY(-100px); opacity: 0; } }
+        @keyframes fallDown { 0% { transform: translateY(-10vh); opacity: 0; } 20% { opacity: 0.6; } 80% { opacity: 0.6; } 100% { transform: translateY(110vh); opacity: 0; } }
+
+        /* --- THE TIMELINE LINE --- */
+        #timeline-container { position: relative; }
+        .timeline-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.05); transform: translateX(-50%); z-index: 5; }
+        .timeline-progress { position: absolute; top: 0; left: 0; width: 100%; height: 0%; background: linear-gradient(to bottom, transparent, #fcf6ba, #d4af37); box-shadow: 0 0 15px #d4af37; }
+        .timeline-node { position: absolute; left: 50%; transform: translate(-50%, -50%); width: 16px; height: 16px; border-radius: 50%; background: var(--deep); border: 2px solid rgba(212, 175, 55, 0.3); z-index: 20; transition: all 0.5s; }
+        .timeline-node.active { background: #d4af37; border-color: #fff; box-shadow: 0 0 20px rgba(212,175,55,0.8); transform: translate(-50%, -50%) scale(1.3); }
+
+        /* --- SCROLL-AWAKENING MEMORY CARDS --- */
+        .memory-card {
+            background: rgba(20, 10, 30, 0.4); backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 15;
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, filter, box-shadow;
+        }
+        
+        .rotate-left { transform: rotate(-4deg) scale(0.95); }
+        .rotate-right { transform: rotate(4deg) scale(0.95); }
+
+        /* The Awake State */
+        .memory-card.is-revealed {
+            transform: rotate(0deg) scale(1.05); border-color: rgba(212, 175, 55, 0.6);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(212,175,55,0.15); z-index: 30;
+        }
+
+        /* Image Filters for "Memory" feel */
+        .era-filter { filter: sepia(50%) grayscale(40%) contrast(110%); transition: filter 1.5s cubic-bezier(0.16, 1, 0.3, 1); will-change: filter; }
+        .memory-card.is-revealed img { filter: sepia(0%) grayscale(0%) contrast(105%) saturate(110%); }
+
+        @media (max-width: 768px) {
+            .timeline-line { left: 24px; transform: none; }
+            .timeline-node { left: 24px; }
+            .mobile-pl { padding-left: 56px !important; }
+        }
+    </style>
+</head>
+<body class="scroll-locked film-grain">
+
+    <audio id="time-music" loop>
+        <source src="https://cdn.pixabay.com/audio/2022/10/05/audio_68629e7695.mp3" type="audio/mp3">
+    </audio>
+
+    <div id="gate-left" class="gate"></div>
+    <div id="gate-right" class="gate"></div>
+    <div id="gate-flash"></div> 
+    
+    <div id="entrance-seal" class="fixed inset-0 z-[100002] flex flex-col items-center justify-center pointer-events-none">
+        <div class="relative flex items-center justify-center w-40 h-40">
+            <div class="portal-ring ring-1 w-full h-full"></div>
+            <div class="portal-ring ring-2 w-full h-full"></div>
+            <div class="portal-ring ring-3 w-full h-full"></div>
+            <i class="fas fa-hourglass-half text-[#d4af37] text-4xl drop-shadow-[0_0_15px_rgba(212,175,55,0.8)] animate-[spin_4s_linear_infinite]"></i>
+        </div>
+        <p class="mt-8 font-cinematic text-[#d4af37] tracking-[0.8em] uppercase text-xs animate-pulse">Reversing Time</p>
+    </div>
+
+    <div class="cursor-dot hidden md:block"></div>
+    <div class="cursor-outline hidden md:block"></div>
+
+    <div id="particles-layer" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <a href="home.html?skipIntro=true#timetravel-anchor" class="fixed top-8 left-6 md:left-8 z-50 text-white/50 hover:text-[#d4af37] transition-colors flex items-center gap-3 cursor-pointer group bg-black/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+        <i class="fas fa-arrow-left transform group-hover:-translate-x-1 transition-transform"></i> 
+        <span class="tracking-[0.3em] text-[10px] uppercase font-cinematic">Return to Now</span>
+    </a>
+
+    <header class="h-[70vh] flex flex-col items-center justify-center text-center relative z-10" id="header-section">
+        <p class="text-[#d4af37] text-[10px] md:text-xs tracking-[1em] uppercase font-mono mb-6">Trips around the sun</p>
+        <h1 class="text-5xl md:text-[8rem] leading-none text-transparent bg-clip-text bg-gradient-to-b from-white via-[#fcf6ba] to-[#8a6219] font-cinematic font-bold drop-shadow-[0_0_30px_rgba(212,175,55,0.3)]">
+            BIRTHDAY <span class="font-emotional text-[#d4af37] lowercase text-6xl md:text-[9rem] px-2 block md:inline">chronicles</span>
+        </h1>
+        <p class="text-sm md:text-xl font-emotional text-purple-200 mt-8 opacity-80 animate-pulse">Scroll to rewind the years</p>
+    </header>
+
+    <main class="w-full max-w-[1200px] mx-auto relative z-10 pb-32" id="timeline-container">
+        
+        <div class="timeline-line hidden md:block"><div class="timeline-progress progress-fill"></div></div>
+        <div class="timeline-line md:hidden"><div class="timeline-progress progress-fill"></div></div> 
+
+        <div class="relative w-full flex items-center mb-32 md:mb-48 timeline-row">
+            <div class="timeline-node"></div>
+            
+            <div class="absolute left-1/2 transform -translate-x-1/2 text-center w-full hidden md:block z-0 pointer-events-none">
+                <h2 class="text-[10rem] font-bold font-cinematic text-white/[0.03] tracking-widest leading-none bg-timeline-text uppercase">CHAPTER I</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 w-full px-6 md:px-12 items-center mobile-pl z-10">
+                <div class="memory-card p-3 md:p-4 rotate-left rounded-xl relative reveal-img order-1 md:order-1">
+                    <img src="media/20.jpg" class="w-full h-[300px] md:h-[400px] object-cover era-filter rounded-lg">
+                </div>
+                <div class="space-y-4 reveal-text order-2 md:order-2 md:pl-8">
+                    <span class="text-[#d4af37] tracking-[0.4em] text-[10px] md:text-sm uppercase font-mono">A Memory Preserved</span>
+                    <h2 class="text-4xl md:text-5xl font-emotional text-white">The Early Magic</h2>
+                    <p class="text-gray-400 leading-relaxed text-sm md:text-base">Looking back at the moments that started it all. A day filled with innocent joy, pure smiles, and the beginning of a beautiful journey.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="relative w-full flex items-center mb-32 md:mb-48 timeline-row">
+            <div class="timeline-node"></div>
+            
+            <div class="absolute left-1/2 transform -translate-x-1/2 text-center w-full hidden md:block z-0 pointer-events-none">
+                <h2 class="text-[10rem] font-bold font-cinematic text-white/[0.03] tracking-widest leading-none bg-timeline-text uppercase">CHAPTER II</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 w-full px-6 md:px-12 items-center mobile-pl z-10">
+                <div class="text-left md:text-right space-y-4 reveal-text order-2 md:order-1 md:pr-8">
+                    <span class="text-[#d4af37] tracking-[0.4em] text-[10px] md:text-sm uppercase font-mono">Growing Up</span>
+                    <h2 class="text-4xl md:text-5xl font-emotional text-white">Sweet Memories</h2>
+                    <p class="text-gray-400 leading-relaxed text-sm md:text-base">Candles blown, wishes made, and surrounded by the people who matter most. Every year adding a little more brilliance to your story.</p>
+                </div>
+                <div class="memory-card p-3 md:p-4 rotate-right rounded-xl relative reveal-img order-1 md:order-2">
+                    <img src="media/21.jpg" class="w-full h-[300px] md:h-[400px] object-cover era-filter rounded-lg">
+                </div>
+            </div>
+        </div>
+
+        <div class="relative w-full flex items-center mb-32 md:mb-48 timeline-row">
+            <div class="timeline-node"></div>
+            
+            <div class="absolute left-1/2 transform -translate-x-1/2 text-center w-full hidden md:block z-0 pointer-events-none">
+                <h2 class="text-[10rem] font-bold font-cinematic text-white/[0.03] tracking-widest leading-none bg-timeline-text uppercase">CHAPTER III</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 w-full px-6 md:px-12 items-center mobile-pl z-10">
+                <div class="memory-card p-3 md:p-4 rotate-left rounded-xl relative reveal-img order-1 md:order-1">
+                    <img src="media/22.jpg" class="w-full h-[300px] md:h-[400px] object-cover era-filter rounded-lg">
+                </div>
+                <div class="space-y-4 reveal-text order-2 md:order-2 md:pl-8">
+                    <span class="text-[#d4af37] tracking-[0.4em] text-[10px] md:text-sm uppercase font-mono">Finding Yourself</span>
+                    <h2 class="text-4xl md:text-5xl font-emotional text-white">A Beautiful Era</h2>
+                    <p class="text-gray-400 leading-relaxed text-sm md:text-base">Stepping into your own. A birthday marked by unforgettable laughter, bolder dreams, and the undeniable glow of confidence.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="relative w-full flex items-center timeline-row pt-10">
+            <div class="timeline-node"></div>
+            
+            <div class="absolute left-1/2 transform -translate-x-1/2 text-center w-full hidden md:block z-0 pointer-events-none">
+                <h2 class="text-[10rem] font-bold font-cinematic text-[#d4af37]/[0.05] tracking-widest leading-none bg-timeline-text uppercase">RECENT</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 w-full px-6 md:px-12 items-center mobile-pl z-10">
+                <div class="text-left md:text-right space-y-4 reveal-text order-2 md:order-1 md:pr-8">
+                    <span class="text-[#d4af37] tracking-[0.4em] text-[10px] md:text-sm uppercase font-mono">The Latest Milestone</span>
+                    <h2 class="text-4xl md:text-5xl font-emotional text-white">Just Yesterday</h2>
+                    <p class="text-gray-400 leading-relaxed text-sm md:text-base">The culmination of all the years before it. A celebration of who you are right now, standing on the edge of greatness.</p>
+                </div>
+                <div class="memory-card p-3 md:p-4 rotate-right rounded-xl relative reveal-img order-1 md:order-2 border-[#d4af37]/40 shadow-[0_0_40px_rgba(212,175,55,0.2)]">
+                    <img src="media/23.jpg" class="w-full h-[300px] md:h-[400px] object-cover era-filter rounded-lg">
+                </div>
+            </div>
+        </div>
+        
+    </main>
+
+    <div class="h-[40vh] flex flex-col items-center justify-center relative overflow-hidden bg-black z-20">
+        <div class="absolute w-[300px] h-[300px] bg-[#d4af37]/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <p class="text-gray-400 font-emotional text-3xl md:text-4xl mb-8 opacity-80">The journey continues...</p>
+        <a href="home.html?skipIntro=true#timetravel-anchor" class="group relative px-8 py-3 md:px-10 md:py-4 border border-[#d4af37]/30 text-[#d4af37] transition-all rounded-full uppercase tracking-[0.3em] text-[10px] overflow-hidden bg-black/50 backdrop-blur-sm">
+            <div class="absolute inset-0 bg-gradient-to-r from-[#d4af37] to-[#8a6219] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
+            <span class="relative z-10 group-hover:text-black font-bold transition-colors">Return to Realm</span>
+        </a>
+    </div>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        const isMobile = window.innerWidth < 768;
+
+        // 1. Smooth Scroll - Stop immediately so user can't scroll while gate is closed
+        let lenis;
+        if (!isMobile) {
+            lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smooth: true });
+            function raf(time) { lenis.raf(time); ScrollTrigger.update(); requestAnimationFrame(raf); }
+            requestAnimationFrame(raf);
+            lenis.stop(); // Lock lenis scrolling
+        }
+
+        // 2. Custom Cursor
+        if (!isMobile && window.matchMedia("(hover: hover)").matches) {
+            const dot = document.querySelector('.cursor-dot');
+            const outline = document.querySelector('.cursor-outline');
+            window.addEventListener('mousemove', e => {
+                gsap.to(dot, { x: e.clientX, y: e.clientY, duration: 0.1 });
+                gsap.to(outline, { x: e.clientX, y: e.clientY, duration: 0.15 });
+            });
+        }
+
+        // 3. Lightweight CSS Particles (Replaces heavy JS GSAP loops)
+        function injectParticles() {
+            const container = document.getElementById('particles-layer');
+            const count = isMobile ? 15 : 30; // Kept very low for performance
+            
+            let html = '';
+            for(let i=0; i<count; i++) {
+                // Upward Dust
+                let leftD = Math.random() * 100;
+                let durD = Math.random() * 4 + 3;
+                let delayD = Math.random() * 5;
+                let sizeD = Math.random() * 2 + 1;
+                html += `<div class="dust" style="left:${leftD}vw; top:${Math.random()*100}vh; width:${sizeD}px; height:${sizeD}px; --dur:${durD}s; animation-delay:-${delayD}s;"></div>`;
+                
+                // Downward Sand
+                let leftS = Math.random() * 100;
+                let durS = Math.random() * 5 + 5;
+                let delayS = Math.random() * 5;
+                html += `<div class="sand-grain" style="left:${leftS}vw; --dur:${durS}s; animation-delay:-${delayS}s;"></div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        // 4. Entrance & Main Animations
+        window.onload = () => {
+            injectParticles();
+            
+            // Audio trigger on first interaction
+            const music = document.getElementById('time-music');
+            document.body.addEventListener('click', () => { music.play().catch(e => console.log(e)); }, {once:true});
+            document.body.addEventListener('scroll', () => { music.play().catch(e => console.log(e)); }, {once:true});
+
+            // Unlock scrolling upon completion
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    document.body.classList.remove('scroll-locked');
+                    if (lenis) lenis.start();
+                }
+            });
+            
+            // Phase 1: Portal Rings Expansion
+            tl.to(".ring-1", { scale: 15, opacity: 0, duration: 1.5, ease: "power2.in" }, "+=0.5")
+              .to(".ring-2", { scale: 15, opacity: 0, duration: 1.5, ease: "power2.in" }, "-=1.2")
+              .to(".ring-3", { scale: 15, opacity: 0, duration: 1.5, ease: "power2.in" }, "-=1.2")
+              .to("#entrance-seal", { opacity: 0, duration: 0.5 }, "-=0.5")
+              
+              // Phase 2: The Light Crack
+              .to("#gate-flash", { opacity: 1, height: "100%", duration: 0.4, ease: "power2.out" })
+              .to("#gate-flash", { width: "100vw", opacity: 0, duration: 1.5, ease: "expo.inOut" }, "open")
+              
+              // Phase 3: Gates Open
+              .to("#gate-left", { x: "-100%", duration: 1.5, ease: "expo.inOut" }, "open")
+              .to("#gate-right", { x: "100%", duration: 1.5, ease: "expo.inOut" }, "open")
+              
+              // Phase 4: Reveal Hero
+              .from("#header-section h1", { y: 30, opacity: 0, duration: 1.5, ease: "expo.out" }, "open+=0.5")
+              .from("#header-section p", { y: 10, opacity: 0, duration: 1, ease: "power3.out", stagger: 0.2 }, "open+=0.7")
+              .set(".gate", { display: "none" })
+              .set("#gate-flash", { display: "none" })
+              .set("#entrance-seal", { display: "none" });
+
+            // Scroll Triggers
+            gsap.to("#header-section", { opacity: 0, y: -50, scrollTrigger: { trigger: "body", start: "top top", end: "15% top", scrub: true }});
+
+            gsap.to(".progress-fill", { height: "100%", ease: "none", scrollTrigger: { trigger: "#timeline-container", start: "top center", end: "bottom center", scrub: true }});
+
+            // Era Row Reveals & Auto-Colorize
+            document.querySelectorAll('.timeline-row').forEach((row) => {
+                const text = row.querySelector('.reveal-text');
+                const imgWrap = row.querySelector('.reveal-img');
+                const bgText = row.querySelector('.bg-timeline-text');
+                const node = row.querySelector('.timeline-node');
+                const memoryCard = row.querySelector('.memory-card');
+
+                // CSS-driven Auto-Awaken Effect (Performance optimized)
+                ScrollTrigger.create({
+                    trigger: memoryCard,
+                    start: "top 65%",
+                    end: "bottom 35%", 
+                    toggleClass: "is-revealed" 
+                });
+
+                ScrollTrigger.create({
+                    trigger: row, start: "top center",
+                    onEnter: () => node.classList.add('active'),
+                    onLeaveBack: () => node.classList.remove('active')
+                });
+
+                gsap.from(text, { y: 40, opacity: 0, duration: 1, ease: "power3.out", scrollTrigger: { trigger: row, start: "top 80%" }});
+                gsap.from(imgWrap, { y: 60, opacity: 0, duration: 1.2, ease: "power3.out", scrollTrigger: { trigger: row, start: "top 80%" }});
+
+                if(bgText && !isMobile) {
+                    gsap.fromTo(bgText, { y: 50, opacity: 0 }, { y: -30, opacity: 1, ease: "none", scrollTrigger: { trigger: row, start: "top 90%", end: "bottom top", scrub: 1 }});
+                }
+            });
+        }
+    </script>
+</body>
+</html>
